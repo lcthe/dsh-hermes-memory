@@ -4,7 +4,7 @@ DSH-native persistent memory, session-aware retrieval, and safe learning for Dee
 
 ## Status
 
-Design and project bootstrap phase. V1 implementation has not started.
+V1 implementation is complete locally. The plugin currently provides explicit memory tools, storage-domain persistence, safety scanning, workspace authorization, and a settings card. Automatic session capture, automatic injection, background review, and vector search remain deferred.
 
 ## Product boundary
 

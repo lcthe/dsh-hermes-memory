@@ -1,0 +1,27 @@
+.section {
+  display: grid;
+  gap: 14px;
+  padding: 4px 0 24px;
+}
+
+.description,
+.note {
+  margin: 0;
+  color: var(--dsh-fg-secondary, #7d8492);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.row,
+.field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--dsh-fg-primary, #eceff4);
+  font-size: 14px;
+}
+
+.field input[type='number'] {
+  width: 96px;
+}
