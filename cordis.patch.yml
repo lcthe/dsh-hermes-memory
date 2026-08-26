@@ -1,0 +1,4 @@
+# @lcthe/dsh-hermes-memory
+- insert:
+    - id: dsh-hermes-memory
+      name: '@lcthe/dsh-hermes-memory'

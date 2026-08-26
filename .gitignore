@@ -1,0 +1,14 @@
+node_modules/
+lib/
+.DS_Store
+*.log
+*.local
+.env
+.env.*
+
+# Local DSH workspace links
+packages/
+
+# Editor files
+.vscode/
+.idea/
