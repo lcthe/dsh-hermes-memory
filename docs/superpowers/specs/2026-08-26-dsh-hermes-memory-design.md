@@ -1,7 +1,7 @@
 # dsh-hermes-memory 设计规范
 
 **日期：** 2026-08-26  
-**状态：** V1 已实现，后续生命周期能力待实现
+**状态：** V1 已实现；V2 会话来源追踪与原生会话搜索设计已确认
 
 ## 1. 设计目标
 
@@ -223,7 +223,9 @@ session/event
 
 V2 使用 `session/flush` 作为可选 durability checkpoint，不能假设观察器参与主事务。
 
-## 9. 自动注入策略
+V2 已实现的会话来源追踪与原生会话搜索详见：
+
+`docs/superpowers/specs/2026-08-26-dsh-hermes-memory-v2-session-search-design.md`
 
 V1 不自动注入。
 

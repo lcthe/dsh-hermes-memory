@@ -141,13 +141,41 @@ V1 不包含：
 9. 项目中不存在 Pi logo、Pi 图片、Pi TUI 或 Pi 运行时依赖；
 10. 不修改 DSH 源码。
 
-## 8. 后续版本方向
+## 8. V2：会话来源追踪与原生会话搜索（已实现）
 
-### V2
+V2 采用 DSH 原生 `session/event`、`session/flush` 和 `ctx.sessionQuery`，不复制 Pi 的会话 JSONL 解析器，不建立第二套会话全文索引。
 
-- 监听 `session/event`，增量记录会话来源；
-- 使用 `ctx.sessionQuery` 提供 `session_memory_search`；
-- 支持 session flush 后的写入 watermark。
+### 8.1 V2 功能
+
+- 维护每个 session 的事件 watermark；
+- 记录 `sessionId`、`eventSeq` 和 `flushedSeq` provenance；
+- 新增 `session_memory_search` 工具；
+- 按当前 workspace 继承 DSH 会话查询授权；
+- 返回有上限的 session/date/project/role/snippet 结果；
+- 观察或查询失败不影响主会话和 V1 记忆工具。
+
+### 8.2 V2 不做
+
+- 不把完整 transcript 复制到记忆存储；
+- 不读取 DSH session SQLite 内部表；
+- 不自动将会话内容写成长久记忆；
+- 不自动注入记忆；
+- 不声明未经 DSH 支持的自定义 SessionEvent。
+
+详细设计见：
+
+`docs/superpowers/specs/2026-08-26-dsh-hermes-memory-v2-session-search-design.md`
+
+### 8.3 V2 验收结果
+
+- `session/event` 只保存 session ID 和 watermark，不保存 transcript；
+- `session/flush` 等待同一 session 的事件写入后更新 flushed watermark；
+- `session_memory_search` 使用 DSH 原生 `sessionQuery`，结果有 limit 和 snippet 上限；
+- 当前 role 过滤支持 `user` 和 `assistant`；
+- workspace 不匹配时返回 `session_scope_denied`；
+- 观察和查询失败不会影响主会话；
+- V2 代码和测试通过 typecheck、17 项测试、build 和 npm pack 检查。
+
 
 ### V3
 

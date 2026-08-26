@@ -17,7 +17,16 @@ export interface MemoryProvenance {
   source: MemorySource
   sessionId?: string
   eventSeq?: number
+  flushedSeq?: number
   projectKey?: string
+}
+
+export interface SessionWatermark {
+  sessionId: string
+  lastEventSeq: number
+  lastFlushedSeq: number
+  updatedAt: string
+  schemaVersion: 1
 }
 
 export interface MemoryRecord {

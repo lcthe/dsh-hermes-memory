@@ -1,4 +1,5 @@
 import type { ToolExecution, ToolResult, ToolRunContext } from '@deepseek-ai/dsh-tools'
+import type { SessionQueryEngine } from '@deepseek-ai/dsh-session-query'
 import type { MemoryRepository } from '../core/memory-repository.ts'
 import { MemoryBlockedError, MemoryNotFoundError } from '../core/memory-repository.ts'
 import { MemoryValidationError } from '../core/validation.ts'
@@ -7,6 +8,7 @@ import { authorizeProjectKey, resolveWorkspace } from './workspace.ts'
 
 export interface ToolContext {
   repository: MemoryRepository
+  sessionQuery: SessionQueryEngine
 }
 
 export interface MemoryToolResult {
@@ -34,6 +36,11 @@ function currentProject(exec: ToolRunContext): string | undefined {
   return resolveWorkspace(exec).projectKey
 }
 
+function currentSessionId(exec: ToolRunContext): string | undefined {
+  const id = exec.agent?.session?.id
+  return typeof id === 'string' && id.length > 0 ? id : undefined
+}
+
 export async function saveMemory(args: {
   scope: MemoryScope
   category: MemoryCategory
@@ -41,8 +48,15 @@ export async function saveMemory(args: {
   projectKey?: string
 }, exec: ToolRunContext, context: ToolContext): Promise<MemoryToolResult> {
   try {
-    const projectKey = args.scope === 'project' ? authorizeProjectKey(args.projectKey, resolveWorkspace(exec)) : undefined
-    const record = await context.repository.save({ ...args, projectKey, provenance: { source: 'tool', projectKey } })
+    const sessionId = currentSessionId(exec)
+    const projectKey = args.scope === 'project'
+      ? authorizeProjectKey(args.projectKey, resolveWorkspace(exec))
+      : undefined
+    const record = await context.repository.save({
+      ...args,
+      projectKey,
+      provenance: { source: 'tool', ...(sessionId ? { sessionId } : {}), projectKey },
+    })
     return { success: true, operation: 'save', record }
   } catch (error) {
     return { success: false, operation: 'save', error: mapMemoryError(error) }

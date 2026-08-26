@@ -16,17 +16,23 @@ import type {
   MemorySearchResult,
 } from '../core/types.ts'
 import type { MemoryRepository } from '../core/memory-repository.ts'
+import { TableWatermarkRepository, type WatermarkRepository } from './watermarks.ts'
 import { memoryDomainSpec } from './storage-spec.ts'
 
 export interface MemoryStorage {
   readonly table: KvTable<string, MemoryRecord>
+  readonly watermarks: WatermarkRepository
   close(): Promise<void>
 }
 
 export async function openMemoryStorage(ctx: Context): Promise<MemoryStorage> {
   const domain: Domain<typeof memoryDomainSpec> = await ctx.storageDomain.open(memoryDomainSpec)
   ctx.effect(() => () => domain.close(), 'dshHermesMemory.domainClose')
-  return { table: domain.table('memories'), close: () => domain.close() }
+  return {
+    table: domain.table('memories'),
+    watermarks: new TableWatermarkRepository(domain.table('watermarks')),
+    close: () => domain.close(),
+  }
 }
 
 export class StorageMemoryRepository implements MemoryRepository {

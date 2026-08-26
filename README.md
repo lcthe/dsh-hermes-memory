@@ -4,7 +4,7 @@ DSH-native persistent memory, session-aware retrieval, and safe learning for Dee
 
 ## Status
 
-V1 implementation is complete locally. The plugin currently provides explicit memory tools, storage-domain persistence, safety scanning, workspace authorization, and a settings card. Automatic session capture, automatic injection, background review, and vector search remain deferred.
+V2 is now implemented locally. The plugin provides explicit memory tools, storage-domain persistence, safety scanning, workspace authorization, a settings card, session provenance, per-session watermarks, and `session_memory_search` through DSH's native `sessionQuery`. Automatic memory injection, background review, and vector search remain deferred.
 
 ## Product boundary
 
@@ -18,6 +18,8 @@ This is a new DSH plugin. It does not copy Pi runtime code, Pi commands, Pi TUI,
 - Pre-write secret and prompt-injection scanning.
 - Settings namespace and a small settings card for enablement, retrieval limits, capture policy, and retention.
 - Source provenance containing session ID and event sequence when a memory comes from a DSH session.
+- `session_memory_search` powered by DSH's native `sessionQuery` service.
+- Per-session event and flush watermarks without copying transcript content.
 
 ## Deferred scope
 
@@ -31,7 +33,8 @@ This is a new DSH plugin. It does not copy Pi runtime code, Pi commands, Pi TUI,
 
 The implementation plan lives at:
 
-- `docs/superpowers/plans/2026-08-26-dsh-hermes-memory.md`
+- `docs/superpowers/specs/2026-08-26-dsh-hermes-memory-v2-session-search-design.md`
+- `docs/superpowers/plans/2026-08-26-dsh-hermes-memory-v2-session-search.md`
 
 The approved design is documented at:
 

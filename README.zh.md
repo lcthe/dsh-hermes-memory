@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-V1 已在本地实现完成，当前提供显式记忆工具、storage-domain 持久化、安全扫描、工作区授权和设置卡片。自动会话捕获、自动注入、后台复盘和向量检索仍属于后续版本。
+V2 已在本地实现完成，当前提供显式记忆工具、storage-domain 持久化、安全扫描、工作区授权、设置卡片、会话来源追踪、每会话 watermark，以及基于 DSH 原生 `sessionQuery` 的 `session_memory_search`。自动注入、后台复盘和向量检索仍属于后续版本。
 
 ## 项目边界
 
@@ -14,10 +14,9 @@ V1 已在本地实现完成，当前提供显式记忆工具、storage-domain �
 
 - `memory_save`、`memory_search`、`memory_replace`、`memory_remove` 显式工具；
 - 全局、用户、项目和失败记忆；
-- 使用 DSH `storage-domain` 持久化；
-- 写入前进行密钥和提示注入扫描；
-- 设置 namespace 和设置卡片；
-- 记忆来源包含会话 ID 和事件序号（如果来源于 DSH 会话）。
+- 记忆来源包含 DSH 会话 ID 和事件序号；
+- 通过 DSH 原生 `sessionQuery` 提供 `session_memory_search`；
+- 维护每个会话的事件和 flush watermark，但不复制会话正文。
 
 ## 暂不实现
 
@@ -31,7 +30,8 @@ V1 已在本地实现完成，当前提供显式记忆工具、storage-domain �
 
 - 需求：`docs/requirements.md`
 - 设计规范：`docs/superpowers/specs/2026-08-26-dsh-hermes-memory-design.md`
-- 实现计划：`docs/superpowers/plans/2026-08-26-dsh-hermes-memory.md`
+- V2 设计：`docs/superpowers/specs/2026-08-26-dsh-hermes-memory-v2-session-search-design.md`
+- V2 计划：`docs/superpowers/plans/2026-08-26-dsh-hermes-memory-v2-session-search.md`
 
 ## 许可证
 

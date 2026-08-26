@@ -1,6 +1,7 @@
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import type { JsonValue, ToolRunContext } from '@deepseek-ai/dsh-tools'
 import { MEMORY_CATEGORIES, MEMORY_SCOPES } from '../core/types.ts'
+import { searchSessionMemory } from './session-search.ts'
 import {
   removeMemory,
   renderMemoryResult,
@@ -67,6 +68,19 @@ export function createMemoryTools(context: ToolContext) {
       },
       output: { schema: outputSchema, render: renderMemoryResult },
       execute: async (args, exec) => asJsonResult(await removeMemory(args, exec, context)),
+    }),
+    defineTool({
+      name: 'session_memory_search',
+      description: 'Search historical DSH sessions through the native session query service.',
+      parameters: {
+        query: { type: 'string', required: true },
+        role: { type: 'string', enum: ['user', 'assistant'] },
+        project: { type: 'string' },
+        limit: { type: 'integer' },
+        snippetChars: { type: 'integer' },
+      },
+      output: { schema: outputSchema, render: renderMemoryResult },
+      execute: async (args, exec) => asJsonResult(await searchSessionMemory(context.sessionQuery, exec, args)),
     }),
   ]
 }

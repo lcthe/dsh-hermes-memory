@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { defineDomain, domainTable } from '@deepseek-ai/dsh-storage-domain'
-import type { MemoryRecord } from '../core/types.ts'
+import type { MemoryRecord, SessionWatermark } from '../core/types.ts'
 
 export const memoryRecordSchema = z.object({
   id: z.string().min(1),
@@ -22,15 +22,25 @@ export const memoryRecordSchema = z.object({
     source: z.union([z.literal('explicit'), z.literal('session'), z.literal('tool'), z.literal('import')]),
     sessionId: z.string().min(1).optional(),
     eventSeq: z.number().int().nonnegative().optional(),
+    flushedSeq: z.number().int().nonnegative().optional(),
     projectKey: z.string().min(1).optional(),
   }),
   schemaVersion: z.literal(1),
 }) satisfies z.ZodType<MemoryRecord>
+
+export const sessionWatermarkSchema = z.object({
+  sessionId: z.string().min(1),
+  lastEventSeq: z.number().int().gte(-1),
+  lastFlushedSeq: z.number().int().gte(-1),
+  updatedAt: z.string().datetime(),
+  schemaVersion: z.literal(1),
+}) satisfies z.ZodType<SessionWatermark>
 
 export const memoryDomainSpec = defineDomain({
   name: 'dsh_hermes_memory',
   version: 1,
   tables: {
     memories: domainTable<string, MemoryRecord>(memoryRecordSchema),
+    watermarks: domainTable<string, SessionWatermark>(sessionWatermarkSchema),
   },
 })
