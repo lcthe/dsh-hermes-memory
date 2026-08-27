@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-V4.2 已在本地实现。过期记忆会按保留策略清理：普通记忆用 `retentionDays`（90 天），失败记忆用 `failureRetentionDays`（30 天），基准为 `lastReferencedAt ?? updatedAt`。清理在启动时执行一次，并随会话启动按进程内每小时节流执行，可整体关闭。后台模型复盘、记忆管理 UI 和向量检索仍然延期。
+V4.2 已在本地实现。过期记忆会按保留策略清理：普通记忆用 `retentionDays`（90 天），失败记忆用 `failureRetentionDays`（30 天），基准为 `lastReferencedAt ?? updatedAt`。清理在启动时执行一次，并随会话启动按进程内每小时节流执行，可整体关闭。后台模型复盘和向量检索仍然延期；独立记忆管理 UI 不在路线内。
 
 ## 项目边界
 
@@ -28,7 +28,8 @@ V4.2 已在本地实现。过期记忆会按保留策略清理：普通记忆用
 - 后台模型复盘和自动合并；
 - 向量或 embedding 检索；
 - 自定义会话数据库；
-- 替换 DSH 聊天界面或设置 shell。
+- 替换 DSH 聊天界面或设置 shell；
+- 独立记忆管理 UI 不在路线内：记忆的查看、筛选和删除通过内置 `memory_list`、`memory_stats`、`memory_replace`、`memory_remove` 工具由 agent 完成。
 
 ## 文档
 

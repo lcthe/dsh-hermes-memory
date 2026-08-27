@@ -232,7 +232,7 @@ V2 采用 DSH 原生 `session/event`、`session/flush` 和 `ctx.sessionQuery`，
 - 基于 assistant/tool 上下文的关联纠正；
 - `ctx.jobs` 后台复盘与 session flush review；
 - retention cleanup、自动合并和淘汰；
-- 记忆管理 UI 与 profile onboarding。
+- profile onboarding（可选）。
 
 ### V4.1：工具失败上下文的纠正捕获（已实现）
 
@@ -269,8 +269,12 @@ V2 采用 DSH 原生 `session/event`、`session/flush` 和 `ctx.sessionQuery`，
 - `ctx.jobs` 后台模型复盘与 session flush review；
 - 软删除、archive 或恢复；
 - 自动合并和淘汰；
-- 记忆管理 UI 与 profile onboarding；
+- profile onboarding（可选）；
 - `agent/pre-step` 动态相关性检索；
 - FTS 或向量检索。
+
+不做：
+
+- 独立记忆管理 UI。记忆的查看、筛选、删除和修改由 agent 通过 `memory_list`、`memory_stats`、`memory_replace`、`memory_remove` 完成，不再建设浏览器端管理页面。
 
 ### V5

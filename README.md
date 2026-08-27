@@ -4,7 +4,7 @@ DSH-native persistent memory, session-aware retrieval, and safe learning for Dee
 
 ## Status
 
-V4.2 is now implemented locally. Expired memories are cleaned by retention policy: non-failure records use `retentionDays` (90) and failure records use `failureRetentionDays` (30), anchored at `lastReferencedAt ?? updatedAt`. Cleanup runs at startup and on a throttled per-session basis, and can be disabled entirely. Background model review, memory management UI, and vector search remain deferred.
+V4.2 is now implemented locally. Expired memories are cleaned by retention policy: non-failure records use `retentionDays` (90) and failure records use `failureRetentionDays` (30), anchored at `lastReferencedAt ?? updatedAt`. Cleanup runs at startup and on a throttled per-session basis, and can be disabled entirely. Background model review and vector search remain deferred; a separate memory management UI is not planned.
 
 ## Product boundary
 
@@ -61,6 +61,7 @@ This is a new DSH plugin. It does not copy Pi runtime code, Pi commands, Pi TUI,
 - Vector or embedding retrieval.
 - Custom session database access.
 - Replacement of DSH chat UI or session shell.
+- A separate memory management UI is not planned: view, filter, and remove memories through the built-in `memory_list`, `memory_stats`, `memory_replace`, and `memory_remove` tools instead.
 
 ## Development
 
