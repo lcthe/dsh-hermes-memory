@@ -16,7 +16,9 @@ export interface MemorySettings {
   captureCorrections: boolean
   captureToolContext: boolean
   captureMaxPerSession: number
+  retentionEnabled: boolean
   retentionDays: number
+  failureRetentionDays: number
   automaticInjection: boolean
   injectionLimit: number
   injectionMaxChars: number
@@ -34,7 +36,9 @@ export const MemorySettingsSchema: z<MemorySettings> = z.object({
   captureCorrections: z.boolean().default(true),
   captureToolContext: z.boolean().default(true),
   captureMaxPerSession: z.number().default(5),
+  retentionEnabled: z.boolean().default(true),
   retentionDays: z.number().default(90),
+  failureRetentionDays: z.number().default(30),
   automaticInjection: z.boolean().default(false),
   injectionLimit: z.number().default(5),
   injectionMaxChars: z.number().default(3_000),
@@ -51,6 +55,9 @@ export function validateMemorySettings(value: MemorySettings): void {
   }
   if (!Number.isInteger(value.captureMaxPerSession) || value.captureMaxPerSession < 1 || value.captureMaxPerSession > 20) {
     throw new Error('memory captureMaxPerSession must be an integer from 1 to 20')
+  }
+  if (!Number.isInteger(value.failureRetentionDays) || value.failureRetentionDays < 1 || value.failureRetentionDays > 3650) {
+    throw new Error('memory failureRetentionDays must be an integer from 1 to 3650')
   }
   if (!Number.isInteger(value.injectionLimit) || value.injectionLimit < 1 || value.injectionLimit > 10) {
     throw new Error('memory injectionLimit must be an integer from 1 to 10')

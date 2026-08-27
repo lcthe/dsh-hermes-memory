@@ -12,7 +12,9 @@ const valid = {
   captureCorrections: true,
   captureToolContext: true,
   captureMaxPerSession: 5,
+  retentionEnabled: true,
   retentionDays: 90,
+  failureRetentionDays: 30,
   automaticInjection: false,
   injectionLimit: 5,
   injectionMaxChars: 3000,
@@ -34,4 +36,6 @@ test('rejects unsafe setting limits', () => {
   assert.throws(() => validateMemorySettings({ ...valid, injectionMaxChars: 8001 }), /injectionMaxChars/)
   assert.throws(() => validateMemorySettings({ ...valid, captureMaxPerSession: 0 }), /captureMaxPerSession/)
   assert.throws(() => validateMemorySettings({ ...valid, captureMaxPerSession: 21 }), /captureMaxPerSession/)
+  assert.throws(() => validateMemorySettings({ ...valid, failureRetentionDays: 0 }), /failureRetentionDays/)
+  assert.throws(() => validateMemorySettings({ ...valid, failureRetentionDays: 3651 }), /failureRetentionDays/)
 })

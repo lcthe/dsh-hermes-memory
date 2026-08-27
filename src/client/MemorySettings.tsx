@@ -43,6 +43,16 @@ export function MemorySettingsSection({ t, read, update }: Props): JSX.Element {
         <input type="number" min={0} max={3650} value={value.retentionDays} disabled={saving} onChange={event => void patch({ retentionDays: Number(event.target.value) })} />
       </label>
       <label className={css.row}>
+        <input type="checkbox" checked={value.retentionEnabled} disabled={saving} onChange={event => void patch({ retentionEnabled: event.target.checked })} />
+        <span>{t('retentionEnabled')}</span>
+      </label>
+      {value.retentionEnabled && (
+        <label className={css.field}>
+          <span>{t('failureRetentionDays')}</span>
+          <input type="number" min={1} max={3650} value={value.failureRetentionDays} disabled={saving} onChange={event => void patch({ failureRetentionDays: Number(event.target.value) })} />
+        </label>
+      )}
+      <label className={css.row}>
         <input type="checkbox" checked={value.automaticCapture} disabled={saving} onChange={event => void patch({ automaticCapture: event.target.checked })} />
         <span>{t('automaticCapture')}</span>
       </label>
