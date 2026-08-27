@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-V4.2 已在本地实现。过期记忆会按保留策略清理：普通记忆用 `retentionDays`（90 天），失败记忆用 `failureRetentionDays`（30 天），基准为 `lastReferencedAt ?? updatedAt`。清理在启动时执行一次，并随会话启动按进程内每小时节流执行，可整体关闭。后台模型复盘和向量检索仍然延期；独立记忆管理 UI 不在路线内。
+V4.2 已在本地实现。过期记忆会按保留策略清理：普通记忆用 `retentionDays`（90 天），失败记忆用 `failureRetentionDays`（30 天），基准为 `lastReferencedAt ?? updatedAt`。清理在启动时执行一次，并随会话启动按进程内每小时节流执行，可整体关闭。后台模型复盘已完成设计规范与实施计划（V5，尚未实现）；向量检索仍然延期；独立记忆管理 UI 不在路线内。
 
 ## 项目边界
 
@@ -45,6 +45,8 @@ V4.2 已在本地实现。过期记忆会按保留策略清理：普通记忆用
 - V4.1 计划：`docs/superpowers/plans/2026-08-27-dsh-hermes-memory-v4-1-tool-context.md`
 - V4.2 设计：`docs/superpowers/specs/2026-08-27-dsh-hermes-memory-v4-2-retention-design.md`
 - V4.2 计划：`docs/superpowers/plans/2026-08-27-dsh-hermes-memory-v4-2-retention.md`
+- V5 设计：`docs/superpowers/specs/2026-08-27-dsh-hermes-memory-v5-background-review-design.md`
+- V5 计划：`docs/superpowers/plans/2026-08-27-dsh-hermes-memory-v5-background-review.md`
 
 ## 许可证
 

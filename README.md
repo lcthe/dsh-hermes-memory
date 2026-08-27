@@ -4,7 +4,7 @@ DSH-native persistent memory, session-aware retrieval, and safe learning for Dee
 
 ## Status
 
-V4.2 is now implemented locally. Expired memories are cleaned by retention policy: non-failure records use `retentionDays` (90) and failure records use `failureRetentionDays` (30), anchored at `lastReferencedAt ?? updatedAt`. Cleanup runs at startup and on a throttled per-session basis, and can be disabled entirely. Background model review and vector search remain deferred; a separate memory management UI is not planned.
+V4.2 is now implemented locally. Expired memories are cleaned by retention policy: non-failure records use `retentionDays` (90) and failure records use `failureRetentionDays` (30), anchored at `lastReferencedAt ?? updatedAt`. Cleanup runs at startup and on a throttled per-session basis, and can be disabled entirely. Background model review is designed and planned (V5) but not yet implemented; vector search remains deferred; a separate memory management UI is not planned.
 
 ## Product boundary
 
@@ -65,7 +65,12 @@ This is a new DSH plugin. It does not copy Pi runtime code, Pi commands, Pi TUI,
 
 ## Development
 
-The implementation plan lives at:
+The V5 design (background model review with safe candidate writes) is documented and planned but not yet implemented:
+
+- `docs/superpowers/specs/2026-08-27-dsh-hermes-memory-v5-background-review-design.md`
+- `docs/superpowers/plans/2026-08-27-dsh-hermes-memory-v5-background-review.md`
+
+The implementation plan for earlier versions lives at:
 
 - `docs/superpowers/specs/2026-08-27-dsh-hermes-memory-v3-session-start-injection-design.md`
 - `docs/superpowers/plans/2026-08-27-dsh-hermes-memory-v3-session-start-injection.md`
