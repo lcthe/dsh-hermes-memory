@@ -58,6 +58,29 @@ export interface MemorySearchInput {
   limit?: number
 }
 
+export interface MemoryListInput {
+  scope?: MemoryScope
+  category?: MemoryCategory
+  projectKey?: string
+  limit?: number
+}
+
+export interface MemoryListResult {
+  records: MemoryRecord[]
+  total: number
+}
+
+export interface MemoryStatsBucket {
+  count: number
+  chars: number
+}
+
+export interface MemoryStatsResult {
+  total: number
+  totalChars: number
+  byScope: Record<MemoryScope, MemoryStatsBucket>
+}
+
 export interface MemorySearchResult {
   records: MemoryRecord[]
   total: number

@@ -3,6 +3,7 @@ import {
   MEMORY_SCOPES,
   type MemoryCategory,
   type MemoryInput,
+  type MemoryListInput,
   type MemoryScope,
   type MemorySearchInput,
 } from './types.ts'
@@ -10,6 +11,9 @@ import {
 export const MAX_MEMORY_CONTENT_LENGTH = 5_000
 export const DEFAULT_SEARCH_LIMIT = 10
 export const MAX_SEARCH_LIMIT = 20
+export const DEFAULT_LIST_LIMIT = 20
+export const MAX_LIST_LIMIT = 50
+export const MAX_LIST_CONTENT_CHARS = 2_000
 
 export class MemoryValidationError extends Error {
   readonly code = 'invalid_args'
@@ -41,6 +45,19 @@ export function validateMemoryInput(input: MemoryInput): MemoryInput {
   }
 
   return { ...input, content, projectKey }
+}
+
+export function validateListInput(input: MemoryListInput = {}): Required<Pick<MemoryListInput, 'limit'>> & Omit<MemoryListInput, 'limit'> {
+  if (!input || typeof input !== 'object') throw new MemoryValidationError('list input is required')
+  if (input.scope !== undefined && !isMemoryScope(input.scope)) throw new MemoryValidationError('memory scope is invalid')
+  if (input.category !== undefined && !isMemoryCategory(input.category)) throw new MemoryValidationError('memory category is invalid')
+  const rawLimit = input.limit ?? DEFAULT_LIST_LIMIT
+  if (!Number.isInteger(rawLimit) || rawLimit < 1) throw new MemoryValidationError('list limit is invalid')
+  return {
+    ...input,
+    projectKey: input.projectKey?.trim() || undefined,
+    limit: Math.min(rawLimit, MAX_LIST_LIMIT),
+  }
 }
 
 export function validateSearchInput(input: MemorySearchInput): Required<Pick<MemorySearchInput, 'query' | 'limit'>> & Omit<MemorySearchInput, 'query' | 'limit'> {

@@ -5,6 +5,8 @@ import {
   MemoryBlockedError,
   MemoryNotFoundError,
   rankMemoryRecords,
+  listMemoryRecords,
+  summarizeMemoryRecords,
 } from '../core/memory-repository.ts'
 import { scanContent } from '../core/content-scanner.ts'
 import { validateMemoryInput, validateSearchInput } from '../core/validation.ts'
@@ -14,6 +16,9 @@ import type {
   MemoryRecord,
   MemorySearchInput,
   MemorySearchResult,
+  MemoryListInput,
+  MemoryListResult,
+  MemoryStatsResult,
 } from '../core/types.ts'
 import type { MemoryRepository } from '../core/memory-repository.ts'
 import { TableWatermarkRepository, type WatermarkRepository } from './watermarks.ts'
@@ -60,6 +65,28 @@ export class StorageMemoryRepository implements MemoryRepository {
 
   async search(input: MemorySearchInput): Promise<MemorySearchResult> {
     return rankMemoryRecords([...this.storage.table.entries()].map(([, record]) => record), input)
+  }
+
+  async list(input: MemoryListInput = {}): Promise<MemoryListResult> {
+    return listMemoryRecords([...this.storage.table.entries()].map(([, record]) => record), input)
+  }
+
+  async getStats(projectKey?: string): Promise<MemoryStatsResult> {
+    return summarizeMemoryRecords([...this.storage.table.entries()].map(([, record]) => record), projectKey)
+  }
+
+  async markReferenced(ids: readonly string[], at = new Date().toISOString()): Promise<void> {
+    let firstError: unknown
+    for (const id of new Set(ids)) {
+      const existing = this.storage.table.get(id)
+      if (!existing || (existing.lastReferencedAt !== undefined && existing.lastReferencedAt >= at)) continue
+      try {
+        await this.storage.table.put(id, { ...existing, lastReferencedAt: at })
+      } catch (error) {
+        firstError ??= error
+      }
+    }
+    if (firstError !== undefined) throw new Error('memory reference timestamp update failed')
   }
 
   async replace(id: string, content: string, category?: MemoryCategory): Promise<MemoryRecord> {
