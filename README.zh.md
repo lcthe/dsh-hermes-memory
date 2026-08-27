@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-V3.1 已在本地实现。除 V3 的启动注入外，记忆现在会在搜索命中和成功注入后维护 `lastReferencedAt`，并新增 `memory_list` 与 `memory_stats` 两个有界工具；该更新为旁路操作且 fail-soft。每步检索、自动捕获、后台复盘和向量检索仍然延期。
+V4 首个切片已在本地实现。规则型自动捕获会从真实用户消息中识别偏好、项目约定和纠正语句，经安全扫描后以 `source: 'session'` 写入记忆。捕获默认关闭并按会话限制条数。后台复盘、retention cleanup 和向量检索仍然延期。
 
 ## 项目边界
 
@@ -17,7 +17,8 @@ V3.1 已在本地实现。除 V3 的启动注入外，记忆现在会在搜索�
 - 记忆来源包含 DSH 会话 ID 和事件序号；
 - 通过 DSH 原生 `sessionQuery` 提供 `session_memory_search`；
 - 可选的 V3 新会话启动参考记忆注入，默认关闭；
-- V3.1 `memory_list`、`memory_stats` 和 `lastReferencedAt` 引用时间维护。
+- V3.1 `memory_list`、`memory_stats` 和 `lastReferencedAt` 引用时间维护；
+- V4 规则型会话捕获（偏好/约定/纠正，默认关闭）。
 
 ## 暂不实现
 
@@ -35,6 +36,8 @@ V3.1 已在本地实现。除 V3 的启动注入外，记忆现在会在搜索�
 - V3 计划：`docs/superpowers/plans/2026-08-27-dsh-hermes-memory-v3-session-start-injection.md`
 - V3.1 设计：`docs/superpowers/specs/2026-08-27-dsh-hermes-memory-v3-1-observability-design.md`
 - V3.1 计划：`docs/superpowers/plans/2026-08-27-dsh-hermes-memory-v3-1-observability.md`
+- V4 设计：`docs/superpowers/specs/2026-08-27-dsh-hermes-memory-v4-capture-design.md`
+- V4 计划：`docs/superpowers/plans/2026-08-27-dsh-hermes-memory-v4-capture.md`
 
 ## 许可证
 

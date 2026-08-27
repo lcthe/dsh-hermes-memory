@@ -208,12 +208,30 @@ V2 采用 DSH 原生 `session/event`、`session/flush` 和 `ctx.sessionQuery`，
 仍延期：
 
 - `agent/pre-step` 动态相关性检索；
-- 自动捕获、后台复盘、自动合并和自动淘汰；
+- 自动合并和自动淘汰；
 - retention cleanup 和 eviction。
 
-### V4
+### V4：规则型会话候选捕获（首个切片已实现）
 
-- 使用 `ctx.jobs` 执行空闲复盘；
-- 自动合并和淘汰；
-- 增加可靠的持久任务队列；
-- 在 Host 侧增加可选 FTS5 或混合检索索引。
+- 从真实 `user/message` 事件中按规则识别偏好、项目约定和纠正语句；
+- 跳过插件注入、AGENTS.md、技能等非用户来源消息；
+- 每条消息至多生成 1 个候选，优先级 correction > convention > preference；
+- 保存前必须通过现有 scanner；project 候选仅在会话存在 cwd 时写入；
+- 幂等依赖 memories 表 provenance 的 sessionId+eventSeq+scope 与 content 去重，不新增存储表、不升级 domain version；
+- 每会话捕获上限 `captureMaxPerSession`（默认 5）；
+- `automaticCapture` 默认关闭，类别开关独立控制；
+- 失败 fail-soft，只记录稳定 warning。
+
+详细设计和实现计划见：
+
+- `docs/superpowers/specs/2026-08-27-dsh-hermes-memory-v4-capture-design.md`
+- `docs/superpowers/plans/2026-08-27-dsh-hermes-memory-v4-capture.md`
+
+后续（仍延期）：
+
+- 基于 assistant/tool 上下文的关联纠正；
+- `ctx.jobs` 后台复盘与 session flush review；
+- retention cleanup、自动合并和淘汰；
+- 记忆管理 UI 与 profile onboarding。
+
+### V5

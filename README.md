@@ -4,7 +4,7 @@ DSH-native persistent memory, session-aware retrieval, and safe learning for Dee
 
 ## Status
 
-V3.1 is also implemented locally. Memories now track `lastReferencedAt` after search hits and successful session-start injection (off-path, fail-soft). New `memory_list` and `memory_stats` tools provide bounded, workspace-scoped visibility for future retention and management workflows. Per-step retrieval, automatic capture, background review, and vector search remain deferred.
+V4's first slice is now implemented locally. Rule-based automatic capture recognizes preference, project-convention, and correction statements in real user messages and saves them at `source: 'session'` after the safety scanner. Capture is off by default and bounded per session. Background review, retention cleanup, and vector search remain deferred.
 
 ## Product boundary
 
@@ -33,6 +33,13 @@ This is a new DSH plugin. It does not copy Pi runtime code, Pi commands, Pi TUI,
 - `memory_stats` reports counts and character usage per scope.
 - `lastReferencedAt` advances on search hits and successful startup injection, off-path and fail-soft.
 - List/stats and reference tracking never bypass the existing exact-match workspace authorization.
+
+## V4 scope (first slice)
+
+- Rule-based captures from real `user/message` events: corrections, project conventions, and preferences.
+- Captured records carry `source: 'session'` provenance with session ID and event sequence.
+- Idempotency via existing provenance fields and content deduplication; no new storage tables or domain version bump.
+- Per-session capture cap, category switches, and safety scanning before every write; default off.
 
 ## Deferred scope
 

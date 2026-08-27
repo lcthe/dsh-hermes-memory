@@ -1,7 +1,16 @@
 # dsh-hermes-memory V4 设计规范：规则型会话候选捕获
 
 **日期：** 2026-08-27  
-**状态：** 已确认，待实现
+**状态：** 已实现
+
+实现结果：
+
+- 纯规则模块 `src/core/capture-rules.ts` 按 correction > convention > preference 输出至多一个候选；
+- Host 捕获器 `src/host/auto-capture.ts` 独立监听 `session/event`，按 session 排队且 fail-soft；
+- 幂等通过 memories 表 provenance（sessionId+eventSeq+scope）与 content 去重实现，未新增存储表；
+- `capturePreferences`、`captureConventions`、`captureCorrections`、`captureMaxPerSession` 设置已生效；
+- 44 项测试全部通过，typecheck、build 和 npm pack 通过；
+- 模型复盘、`ctx.jobs`、上下文关联纠正和 retention cleanup 继续延期。
 
 ## 1. 目标
 
