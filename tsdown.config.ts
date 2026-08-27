@@ -29,6 +29,7 @@ function libraryConfig(): UserConfig {
     fixedExtension: false,
     dts: false,
     clean: false,
+    external: ['@deepseek-ai/dsh-llm'],
   }
 }
 

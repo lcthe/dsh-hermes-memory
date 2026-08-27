@@ -43,10 +43,26 @@ export function MemorySettingsSection({ t, read, update }: Props): JSX.Element {
         <input type="number" min={0} max={3650} value={value.retentionDays} disabled={saving} onChange={event => void patch({ retentionDays: Number(event.target.value) })} />
       </label>
       <label className={css.row}>
-        <input type="checkbox" checked={false} disabled />
-        <span>{t('automaticCapture')}</span>
+        <input type="checkbox" checked={value.automaticInjection} disabled={saving} onChange={event => void patch({ automaticInjection: event.target.checked })} />
+        <span>{t('automaticInjection')}</span>
       </label>
-      <p className={css.note}>{t('automaticNote')}</p>
+      <label className={css.row}>
+        <input type="checkbox" checked={value.includeUserMemory} disabled={saving} onChange={event => void patch({ includeUserMemory: event.target.checked })} />
+        <span>{t('includeUserMemory')}</span>
+      </label>
+      <label className={css.row}>
+        <input type="checkbox" checked={value.includeProjectMemory} disabled={saving} onChange={event => void patch({ includeProjectMemory: event.target.checked })} />
+        <span>{t('includeProjectMemory')}</span>
+      </label>
+      <label className={css.field}>
+        <span>{t('injectionLimit')}</span>
+        <input type="number" min={1} max={10} value={value.injectionLimit} disabled={saving} onChange={event => void patch({ injectionLimit: Number(event.target.value) })} />
+      </label>
+      <label className={css.field}>
+        <span>{t('injectionMaxChars')}</span>
+        <input type="number" min={500} max={8000} value={value.injectionMaxChars} disabled={saving} onChange={event => void patch({ injectionMaxChars: Number(event.target.value) })} />
+      </label>
+      <p className={css.note}>{t('injectionNote')}</p>
       {!value.enabled && <p className={css.note}>{t('disabledNote')}</p>}
     </section>
   )

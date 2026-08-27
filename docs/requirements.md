@@ -177,11 +177,26 @@ V2 采用 DSH 原生 `session/event`、`session/flush` 和 `ctx.sessionQuery`，
 - V2 代码和测试通过 typecheck、17 项测试、build 和 npm pack 检查。
 
 
-### V3
+### V3：新会话记忆注入（首个切片已实现）
 
-- 在 `agent/session-start` 注入有限的用户和项目记忆；
-- 在 `agent/pre-step` 中提供可选的相关记忆检索；
-- 增加 token 上限、去重和递归保护。
+- 默认关闭 `agent/session-start` 自动注入；
+- 只读取已持久化且通过现有 scanner 的 global、user 和当前 project 记忆；
+- 使用 DSH `agent.inject()`，每个 agent 生命周期最多注入一次；
+- 注入条数和总字符数有硬上限；
+- 失败时 fail-soft，不影响会话启动；
+- 不在 `agent/pre-step` 中重复检索；
+- 不从会话内容自动生成新记忆。
+
+详细设计和实现计划见：
+
+- `docs/superpowers/specs/2026-08-27-dsh-hermes-memory-v3-session-start-injection-design.md`
+- `docs/superpowers/plans/2026-08-27-dsh-hermes-memory-v3-session-start-injection.md`
+
+V3.1 仍延期：
+
+- `agent/pre-step` 动态相关性检索；
+- 每步 token 预算、去重和递归保护；
+- 自动捕获、后台复盘、自动合并和自动淘汰。
 
 ### V4
 

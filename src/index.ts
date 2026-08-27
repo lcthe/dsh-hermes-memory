@@ -4,6 +4,7 @@ import type { ToolDefinition } from '@deepseek-ai/dsh-tools'
 import { openMemoryStorage, StorageMemoryRepository } from './host/storage.ts'
 import { createMemoryTools } from './host/tool-definitions.ts'
 import { installSessionCapture } from './host/session-capture.ts'
+import { installMemoryInjection } from './host/memory-injection.ts'
 import { validateMemorySettings, MemorySettingsSchema, MEMORY_SETTINGS_NS } from './host/settings.ts'
 
 export const name = '@lcthe/dsh-hermes-memory'
@@ -18,6 +19,7 @@ export async function apply(ctx: Context): Promise<void> {
   const repository = new StorageMemoryRepository(storage)
   const tools = createMemoryTools({ repository, sessionQuery: ctx.sessionQuery })
   const disposeSessionCapture = installSessionCapture(ctx, storage.watermarks)
+  const disposeMemoryInjection = installMemoryInjection(ctx, storage, settings, ctx.logger)
 
   let disposers: Array<() => void> = []
   const syncTools = (): void => {
@@ -31,6 +33,7 @@ export async function apply(ctx: Context): Promise<void> {
   ctx.effect(() => () => {
     stopWatch()
     disposeSessionCapture()
+    disposeMemoryInjection()
     for (const dispose of disposers) dispose()
   }, 'dshHermesMemory.tools')
 }

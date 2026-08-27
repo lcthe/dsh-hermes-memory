@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-V2 已在本地实现完成，当前提供显式记忆工具、storage-domain 持久化、安全扫描、工作区授权、设置卡片、会话来源追踪、每会话 watermark，以及基于 DSH 原生 `sessionQuery` 的 `session_memory_search`。自动注入、后台复盘和向量检索仍属于后续版本。
+V3 首个切片已在本地实现。除 V1/V2 功能外，插件现在可以在 `agent/session-start` 时可选地注入一次有字符上限的参考记忆上下文。该功能默认关闭，只读取当前有权访问的全局、用户和项目记忆，不会自动捕获新记忆。每步检索和后台复盘仍然延期。
 
 ## 项目边界
 
@@ -16,7 +16,7 @@ V2 已在本地实现完成，当前提供显式记忆工具、storage-domain �
 - 全局、用户、项目和失败记忆；
 - 记忆来源包含 DSH 会话 ID 和事件序号；
 - 通过 DSH 原生 `sessionQuery` 提供 `session_memory_search`；
-- 维护每个会话的事件和 flush watermark，但不复制会话正文。
+- 可选的 V3 新会话启动参考记忆注入，默认关闭。
 
 ## 暂不实现
 
@@ -30,8 +30,8 @@ V2 已在本地实现完成，当前提供显式记忆工具、storage-domain �
 
 - 需求：`docs/requirements.md`
 - 设计规范：`docs/superpowers/specs/2026-08-26-dsh-hermes-memory-design.md`
-- V2 设计：`docs/superpowers/specs/2026-08-26-dsh-hermes-memory-v2-session-search-design.md`
-- V2 计划：`docs/superpowers/plans/2026-08-26-dsh-hermes-memory-v2-session-search.md`
+- V3 设计：`docs/superpowers/specs/2026-08-27-dsh-hermes-memory-v3-session-start-injection-design.md`
+- V3 计划：`docs/superpowers/plans/2026-08-27-dsh-hermes-memory-v3-session-start-injection.md`
 
 ## 许可证
 

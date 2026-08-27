@@ -4,7 +4,7 @@ DSH-native persistent memory, session-aware retrieval, and safe learning for Dee
 
 ## Status
 
-V2 is now implemented locally. The plugin provides explicit memory tools, storage-domain persistence, safety scanning, workspace authorization, a settings card, session provenance, per-session watermarks, and `session_memory_search` through DSH's native `sessionQuery`. Automatic memory injection, background review, and vector search remain deferred.
+V3's first slice is now implemented locally. In addition to the V1/V2 features, the plugin can optionally inject a bounded reference context once at `agent/session-start`. Injection is disabled by default, limited to authorized global/user/project memories, and does not capture new memories automatically. Per-step retrieval and background review remain deferred.
 
 ## Product boundary
 
@@ -19,8 +19,13 @@ This is a new DSH plugin. It does not copy Pi runtime code, Pi commands, Pi TUI,
 - Settings namespace and a small settings card for enablement, retrieval limits, capture policy, and retention.
 - Source provenance containing session ID and event sequence when a memory comes from a DSH session.
 - `session_memory_search` powered by DSH's native `sessionQuery` service.
-- Per-session event and flush watermarks without copying transcript content.
+- Optional V3 session-start injection of bounded reference context, off by default.
 
+## V3 scope
+
+- Opt-in `agent/session-start` injection of one bounded `form: 'recall'` context message per agent lifecycle.
+- Authorized global, user, and current project memories only; failure memories are not injected automatically.
+- Deterministic scope/date/ID ordering, entry limits, total character limits, resume de-duplication, and fail-soft startup behavior.
 ## Deferred scope
 
 - Automatic prompt injection on every step.
@@ -33,8 +38,8 @@ This is a new DSH plugin. It does not copy Pi runtime code, Pi commands, Pi TUI,
 
 The implementation plan lives at:
 
-- `docs/superpowers/specs/2026-08-26-dsh-hermes-memory-v2-session-search-design.md`
-- `docs/superpowers/plans/2026-08-26-dsh-hermes-memory-v2-session-search.md`
+- `docs/superpowers/specs/2026-08-27-dsh-hermes-memory-v3-session-start-injection-design.md`
+- `docs/superpowers/plans/2026-08-27-dsh-hermes-memory-v3-session-start-injection.md`
 
 The approved design is documented at:
 
