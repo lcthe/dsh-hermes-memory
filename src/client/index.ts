@@ -39,6 +39,7 @@ export function apply(ctx: ClientContext): void {
         capturePreferences: true,
         captureConventions: true,
         captureCorrections: true,
+        captureToolContext: true,
         captureMaxPerSession: 5,
         retentionDays: 90,
         automaticInjection: false,

@@ -14,6 +14,7 @@ export interface MemorySettings {
   capturePreferences: boolean
   captureConventions: boolean
   captureCorrections: boolean
+  captureToolContext: boolean
   captureMaxPerSession: number
   retentionDays: number
   automaticInjection: boolean
@@ -31,6 +32,7 @@ export const MemorySettingsSchema: z<MemorySettings> = z.object({
   capturePreferences: z.boolean().default(true),
   captureConventions: z.boolean().default(true),
   captureCorrections: z.boolean().default(true),
+  captureToolContext: z.boolean().default(true),
   captureMaxPerSession: z.number().default(5),
   retentionDays: z.number().default(90),
   automaticInjection: z.boolean().default(false),

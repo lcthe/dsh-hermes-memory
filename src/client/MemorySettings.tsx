@@ -60,6 +60,10 @@ export function MemorySettingsSection({ t, read, update }: Props): JSX.Element {
             <input type="checkbox" checked={value.captureCorrections} disabled={saving} onChange={event => void patch({ captureCorrections: event.target.checked })} />
             <span>{t('captureCorrections')}</span>
           </label>
+          <label className={css.row}>
+            <input type="checkbox" checked={value.captureToolContext} disabled={saving} onChange={event => void patch({ captureToolContext: event.target.checked })} />
+            <span>{t('captureToolContext')}</span>
+          </label>
           <label className={css.field}>
             <span>{t('captureMaxPerSession')}</span>
             <input type="number" min={1} max={20} value={value.captureMaxPerSession} disabled={saving} onChange={event => void patch({ captureMaxPerSession: Number(event.target.value) })} />
