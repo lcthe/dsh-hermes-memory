@@ -1,7 +1,16 @@
 # dsh-hermes-memory V4.2 设计规范：retention 清理
 
 **日期：** 2026-08-27  
-**状态：** 已确认，待实现
+**状态：** 已实现
+
+实现结果：
+
+- `retentionDays`（默认 90）与 `failureRetentionDays`（默认 30）均已生效；
+- `selectExpiredRecords` 按 scope 阈值、以 `lastReferencedAt ?? updatedAt` 为基准选择过期记录；
+- `installRetention` 在启动时清扫一次，并随 `agent/session-start` 按进程内每小时节流清扫；
+- 硬删除 + 数量日志，单条删除失败跳过；`retentionEnabled` 可整体关闭；
+- 54 项测试全部通过，typecheck、build 和 npm pack 通过；
+- `ctx.jobs` 模型复盘、软删除/archive 以及 retention UI 继续延期。
 
 ## 1. 目标
 

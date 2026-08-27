@@ -4,7 +4,7 @@ DSH-native persistent memory, session-aware retrieval, and safe learning for Dee
 
 ## Status
 
-V4.1 is now implemented locally. When a correction capture follows a failed tool call in the same conversation exchange, the plugin also saves a `failure/tool-quirk` record naming the tool. Capture remains off by default. Background review, retention cleanup, and vector search remain deferred.
+V4.2 is now implemented locally. Expired memories are cleaned by retention policy: non-failure records use `retentionDays` (90) and failure records use `failureRetentionDays` (30), anchored at `lastReferencedAt ?? updatedAt`. Cleanup runs at startup and on a throttled per-session basis, and can be disabled entirely. Background model review, memory management UI, and vector search remain deferred.
 
 ## Product boundary
 
@@ -46,6 +46,13 @@ This is a new DSH plugin. It does not copy Pi runtime code, Pi commands, Pi TUI,
 - Per-session tracking of `lastToolCall`/`lastFailure` and the previous user-message sequence.
 - Corrections paired with a failed tool call in the same exchange also save a `failure/tool-quirk` record naming the tool.
 - A failure context is consumed at most once; `captureToolContext` lets users disable pairing.
+
+## V4.2 scope
+
+- Expired memory cleanup using `lastReferencedAt ?? updatedAt` as the aging anchor.
+- Failure-scope records expire after `failureRetentionDays`; all others after `retentionDays`.
+- Hard delete with count-only logging; invalid timestamps are kept; `retentionEnabled` can disable cleanup.
+- Sweeps run at startup and are throttled to once per hour per process on session starts.
 
 ## Deferred scope
 

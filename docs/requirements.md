@@ -249,4 +249,28 @@ V2 采用 DSH 原生 `session/event`、`session/flush` 和 `ctx.sessionQuery`，
 - `docs/superpowers/specs/2026-08-27-dsh-hermes-memory-v4-1-tool-context-design.md`
 - `docs/superpowers/plans/2026-08-27-dsh-hermes-memory-v4-1-tool-context.md`
 
+### V4.2：retention 清理（已实现）
+
+- 非 failure 记忆使用 `retentionDays`（默认 90），failure 记忆使用 `failureRetentionDays`（默认 30）；
+- 保留基准为 `lastReferencedAt ?? updatedAt`，引用后保留时钟重置；
+- 仅在 `now - anchor > 阈值` 时删除；非法时间戳不删除；
+- 硬删除，日志只输出删除数量；单条删除失败跳过；
+- 清理在插件启动时执行一次，并随 `agent/session-start` 按进程内每小时节流执行；
+- `retentionEnabled` 可整体关闭；
+- 不清理 `watermarks` 表，不触碰 DSH 会话数据。
+
+详细设计和实现计划见：
+
+- `docs/superpowers/specs/2026-08-27-dsh-hermes-memory-v4-2-retention-design.md`
+- `docs/superpowers/plans/2026-08-27-dsh-hermes-memory-v4-2-retention.md`
+
+仍延期：
+
+- `ctx.jobs` 后台模型复盘与 session flush review；
+- 软删除、archive 或恢复；
+- 自动合并和淘汰；
+- 记忆管理 UI 与 profile onboarding；
+- `agent/pre-step` 动态相关性检索；
+- FTS 或向量检索。
+
 ### V5

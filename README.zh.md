@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-V4.1 已在本地实现。当纠正捕获发生在同一轮对话中失败的工具调用之后时，插件会额外保存一条标明工具名与纠正内容的 `failure/tool-quirk` 记录。捕获默认保持关闭。后台复盘、retention cleanup 和向量检索仍然延期。
+V4.2 已在本地实现。过期记忆会按保留策略清理：普通记忆用 `retentionDays`（90 天），失败记忆用 `failureRetentionDays`（30 天），基准为 `lastReferencedAt ?? updatedAt`。清理在启动时执行一次，并随会话启动按进程内每小时节流执行，可整体关闭。后台模型复盘、记忆管理 UI 和向量检索仍然延期。
 
 ## 项目边界
 
@@ -19,7 +19,8 @@ V4.1 已在本地实现。当纠正捕获发生在同一轮对话中失败的工
 - 可选的 V3 新会话启动参考记忆注入，默认关闭；
 - V3.1 `memory_list`、`memory_stats` 和 `lastReferencedAt` 引用时间维护；
 - V4 规则型会话捕获（偏好/约定/纠正，默认关闭）；
-- V4.1 纠正与同轮失败工具调用的关联捕获（tool-quirk，默认开启但受自动捕获总开关控制）。
+- V4.1 纠正与同轮失败工具调用的关联捕获（tool-quirk，默认开启但受自动捕获总开关控制）；
+- V4.2 过期记忆清理（`retentionDays`/`failureRetentionDays`，启动 + 会话节流清扫）。
 
 ## 暂不实现
 
@@ -41,6 +42,8 @@ V4.1 已在本地实现。当纠正捕获发生在同一轮对话中失败的工
 - V4 计划：`docs/superpowers/plans/2026-08-27-dsh-hermes-memory-v4-capture.md`
 - V4.1 设计：`docs/superpowers/specs/2026-08-27-dsh-hermes-memory-v4-1-tool-context-design.md`
 - V4.1 计划：`docs/superpowers/plans/2026-08-27-dsh-hermes-memory-v4-1-tool-context.md`
+- V4.2 设计：`docs/superpowers/specs/2026-08-27-dsh-hermes-memory-v4-2-retention-design.md`
+- V4.2 计划：`docs/superpowers/plans/2026-08-27-dsh-hermes-memory-v4-2-retention.md`
 
 ## 许可证
 
