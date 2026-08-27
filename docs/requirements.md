@@ -234,4 +234,19 @@ V2 采用 DSH 原生 `session/event`、`session/flush` 和 `ctx.sessionQuery`，
 - retention cleanup、自动合并和淘汰；
 - 记忆管理 UI 与 profile onboarding。
 
+### V4.1：工具失败上下文的纠正捕获（已实现）
+
+- 按 session 追踪 `lastToolCall` 与 `lastFailure`；
+- 用户纠正命中且上一用户消息之后存在失败工具调用时，额外保存 `failure/tool-quirk`，内容标明工具名；
+- `errorSeq > lastUserSeq` 保证同一失败上下文最多被消费一次；
+- 事件幂等升级为按 scope + category 判断，重放不会产生第二对记录；
+- `captureToolContext` 设置默认开启，可显式关闭；
+- 工具名无法解析时回退为普通 correction；
+- 不新增存储表，不升级 domain version。
+
+详细设计和实现计划见：
+
+- `docs/superpowers/specs/2026-08-27-dsh-hermes-memory-v4-1-tool-context-design.md`
+- `docs/superpowers/plans/2026-08-27-dsh-hermes-memory-v4-1-tool-context.md`
+
 ### V5

@@ -1,7 +1,16 @@
 # dsh-hermes-memory V4.1 设计规范：工具失败上下文的纠正捕获
 
 **日期：** 2026-08-27  
-**状态：** 已确认，待实现
+**状态：** 已实现
+
+实现结果：
+
+- 捕获器按 session 维护 `lastUserSeq`、`lastToolCall`、`lastFailure`；
+- `tool/call` 与 `tool/result(error)` 事件更新状态，纠正命中且 `errorSeq > lastUserSeq` 时额外保存 `failure/tool-quirk`；
+- 事件幂等升级为按 scope + category 判断，重复事件不会产生第二对记录；
+- `captureToolContext` 设置默认 true，可在设置页关闭；
+- 49 项测试全部通过，typecheck、build 和 npm pack 通过；
+- 模型复盘、`ctx.jobs` 和 retention cleanup 继续延期。
 
 ## 1. 目标
 

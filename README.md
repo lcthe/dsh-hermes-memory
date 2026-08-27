@@ -4,7 +4,7 @@ DSH-native persistent memory, session-aware retrieval, and safe learning for Dee
 
 ## Status
 
-V4's first slice is now implemented locally. Rule-based automatic capture recognizes preference, project-convention, and correction statements in real user messages and saves them at `source: 'session'` after the safety scanner. Capture is off by default and bounded per session. Background review, retention cleanup, and vector search remain deferred.
+V4.1 is now implemented locally. When a correction capture follows a failed tool call in the same conversation exchange, the plugin also saves a `failure/tool-quirk` record naming the tool. Capture remains off by default. Background review, retention cleanup, and vector search remain deferred.
 
 ## Product boundary
 
@@ -40,6 +40,12 @@ This is a new DSH plugin. It does not copy Pi runtime code, Pi commands, Pi TUI,
 - Captured records carry `source: 'session'` provenance with session ID and event sequence.
 - Idempotency via existing provenance fields and content deduplication; no new storage tables or domain version bump.
 - Per-session capture cap, category switches, and safety scanning before every write; default off.
+
+## V4.1 scope
+
+- Per-session tracking of `lastToolCall`/`lastFailure` and the previous user-message sequence.
+- Corrections paired with a failed tool call in the same exchange also save a `failure/tool-quirk` record naming the tool.
+- A failure context is consumed at most once; `captureToolContext` lets users disable pairing.
 
 ## Deferred scope
 
