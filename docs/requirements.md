@@ -174,10 +174,9 @@ V2 采用 DSH 原生 `session/event`、`session/flush` 和 `ctx.sessionQuery`，
 - 当前 role 过滤支持 `user` 和 `assistant`；
 - workspace 不匹配时返回 `session_scope_denied`；
 - 观察和查询失败不会影响主会话；
-- V2 代码和测试通过 typecheck、17 项测试、build 和 npm pack 检查。
+- V3 代码和测试通过 typecheck、26 项测试、build 和 npm pack 检查。
 
-
-### V3：新会话记忆注入（首个切片已实现）
+### V3：新会话记忆注入（已实现）
 
 - 默认关闭 `agent/session-start` 自动注入；
 - 只读取已持久化且通过现有 scanner 的 global、user 和当前 project 记忆；
@@ -192,11 +191,25 @@ V2 采用 DSH 原生 `session/event`、`session/flush` 和 `ctx.sessionQuery`，
 - `docs/superpowers/specs/2026-08-27-dsh-hermes-memory-v3-session-start-injection-design.md`
 - `docs/superpowers/plans/2026-08-27-dsh-hermes-memory-v3-session-start-injection.md`
 
-V3.1 仍延期：
+### V3.1：记忆可观测性与引用新鲜度（已实现）
+
+- `lastReferencedAt` 在搜索命中和成功启动注入后更新；
+- 更新失败 fail-soft，不影响搜索、注入或会话启动；
+- 新增 `memory_list`，按 scope/category/当前 workspace 返回有界记录；
+- 新增 `memory_stats`，返回条数、字符数和各 scope 统计；
+- 列表与统计工具继承现有 exact-match workspace 授权；
+- V3.1 不实现自动捕获、后台复盘、retention cleanup 和 FTS。
+
+详细设计和实现计划见：
+
+- `docs/superpowers/specs/2026-08-27-dsh-hermes-memory-v3-1-observability-design.md`
+- `docs/superpowers/plans/2026-08-27-dsh-hermes-memory-v3-1-observability.md`
+
+仍延期：
 
 - `agent/pre-step` 动态相关性检索；
-- 每步 token 预算、去重和递归保护；
-- 自动捕获、后台复盘、自动合并和自动淘汰。
+- 自动捕获、后台复盘、自动合并和自动淘汰；
+- retention cleanup 和 eviction。
 
 ### V4
 

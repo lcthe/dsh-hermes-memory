@@ -1,7 +1,15 @@
 # dsh-hermes-memory V3.1 设计规范：记忆可观测性与引用新鲜度
 
 **日期：** 2026-08-27  
-**状态：** 已确认，待实现
+**状态：** 已实现
+
+实现结果：
+
+- `MemoryRepository` 新增 `list`、`getStats`、`markReferenced`，InMemory 与 storage-domain 实现保持一致语义；
+- `memory_list` 和 `memory_stats` 已注册为 DSH 工具，结果有界并继承 workspace exact-match 授权；
+- `lastReferencedAt` 在 `memory_search` 命中和成功启动注入后异步更新，更新失败只记录稳定 warning；
+- 34 项测试全部通过，typecheck、build 和 npm pack 通过；
+- 自动捕获、后台 review、retention cleanup 和 FTS 继续延期。
 
 ## 1. 目标
 

@@ -4,7 +4,7 @@ DSH-native persistent memory, session-aware retrieval, and safe learning for Dee
 
 ## Status
 
-V3's first slice is now implemented locally. In addition to the V1/V2 features, the plugin can optionally inject a bounded reference context once at `agent/session-start`. Injection is disabled by default, limited to authorized global/user/project memories, and does not capture new memories automatically. Per-step retrieval and background review remain deferred.
+V3.1 is also implemented locally. Memories now track `lastReferencedAt` after search hits and successful session-start injection (off-path, fail-soft). New `memory_list` and `memory_stats` tools provide bounded, workspace-scoped visibility for future retention and management workflows. Per-step retrieval, automatic capture, background review, and vector search remain deferred.
 
 ## Product boundary
 
@@ -26,6 +26,14 @@ This is a new DSH plugin. It does not copy Pi runtime code, Pi commands, Pi TUI,
 - Opt-in `agent/session-start` injection of one bounded `form: 'recall'` context message per agent lifecycle.
 - Authorized global, user, and current project memories only; failure memories are not injected automatically.
 - Deterministic scope/date/ID ordering, entry limits, total character limits, resume de-duplication, and fail-soft startup behavior.
+
+## V3.1 scope
+
+- `memory_list` lists bounded records by scope/category and the current workspace.
+- `memory_stats` reports counts and character usage per scope.
+- `lastReferencedAt` advances on search hits and successful startup injection, off-path and fail-soft.
+- List/stats and reference tracking never bypass the existing exact-match workspace authorization.
+
 ## Deferred scope
 
 - Automatic prompt injection on every step.
