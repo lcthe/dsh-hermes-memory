@@ -127,11 +127,16 @@ function alreadyInjected(agent: MemoryInjectionAgent): boolean {
   return false
 }
 
+export interface MemoryReferenceMaintenance {
+  markReferenced(ids: readonly string[], at?: string): Promise<void>
+}
+
 export function installMemoryInjection(
   ctx: Context,
   storage: MemoryStorage,
   settings: { get(): MemorySettings },
   logger: { warn(message: string): void },
+  repository: MemoryReferenceMaintenance,
 ): () => boolean {
   const injected = new WeakSet<object>()
   const stop = ctx.on('agent/session-start', ({ agent }) => {
@@ -155,6 +160,11 @@ export function installMemoryInjection(
           form: 'recall',
         },
       }))
+      if (records.length > 0) {
+        void repository.markReferenced(records.map(record => record.id)).catch(() => {
+          logger.warn('dsh-hermes-memory: memory reference timestamp update skipped')
+        })
+      }
     } catch {
       logger.warn('dsh-hermes-memory: startup memory injection skipped')
     }

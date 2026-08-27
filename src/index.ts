@@ -17,9 +17,9 @@ export async function apply(ctx: Context): Promise<void> {
   })
   const storage = await openMemoryStorage(ctx)
   const repository = new StorageMemoryRepository(storage)
-  const tools = createMemoryTools({ repository, sessionQuery: ctx.sessionQuery })
+  const tools = createMemoryTools({ repository, sessionQuery: ctx.sessionQuery, logger: ctx.logger })
   const disposeSessionCapture = installSessionCapture(ctx, storage.watermarks)
-  const disposeMemoryInjection = installMemoryInjection(ctx, storage, settings, ctx.logger)
+  const disposeMemoryInjection = installMemoryInjection(ctx, storage, settings, ctx.logger, repository)
 
   let disposers: Array<() => void> = []
   const syncTools = (): void => {

@@ -3,11 +3,13 @@ import type { JsonValue, ToolRunContext } from '@deepseek-ai/dsh-tools'
 import { MEMORY_CATEGORIES, MEMORY_SCOPES } from '../core/types.ts'
 import { searchSessionMemory } from './session-search.ts'
 import {
+  listMemory,
   removeMemory,
   renderMemoryResult,
   replaceMemory,
   saveMemory,
   searchMemory,
+  statsMemory,
   type ToolContext,
 } from './tools.ts'
 
@@ -81,6 +83,27 @@ export function createMemoryTools(context: ToolContext) {
       },
       output: { schema: outputSchema, render: renderMemoryResult },
       execute: async (args, exec) => asJsonResult(await searchSessionMemory(context.sessionQuery, exec, args)),
+    }),
+    defineTool({
+      name: 'memory_list',
+      description: 'List bounded persistent memories visible to the current DSH workspace.',
+      parameters: {
+        scope: scopeSchema,
+        category: categorySchema,
+        projectKey: { type: 'string' },
+        limit: { type: 'integer' },
+      },
+      output: { schema: outputSchema, render: renderMemoryResult },
+      execute: async (args, exec) => asJsonResult(await listMemory(args, exec, context)),
+    }),
+    defineTool({
+      name: 'memory_stats',
+      description: 'Summarize bounded memory counts and character usage for the current workspace.',
+      parameters: {
+        projectKey: { type: 'string' },
+      },
+      output: { schema: outputSchema, render: renderMemoryResult },
+      execute: async (args, exec) => asJsonResult(await statsMemory(args, exec, context)),
     }),
   ]
 }

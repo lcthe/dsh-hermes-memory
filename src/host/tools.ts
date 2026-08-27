@@ -4,19 +4,22 @@ import type { MemoryRepository } from '../core/memory-repository.ts'
 import { MemoryBlockedError, MemoryNotFoundError } from '../core/memory-repository.ts'
 import { MemoryValidationError } from '../core/validation.ts'
 import type { MemoryCategory, MemoryScope } from '../core/types.ts'
+import { MAX_LIST_CONTENT_CHARS } from '../core/validation.ts'
 import { authorizeProjectKey, resolveWorkspace } from './workspace.ts'
 
 export interface ToolContext {
   repository: MemoryRepository
   sessionQuery: SessionQueryEngine
+  logger?: { warn(message: string): void }
 }
 
 export interface MemoryToolResult {
   success: boolean
-  operation: 'save' | 'search' | 'replace' | 'remove'
+  operation: 'save' | 'search' | 'list' | 'stats' | 'replace' | 'remove'
   record?: unknown
   records?: unknown[]
   total?: number
+  stats?: unknown
   error?: { code: string; message: string }
 }
 
@@ -73,6 +76,11 @@ export async function searchMemory(args: {
   try {
     const projectKey = args.projectKey === undefined ? currentProject(exec) : authorizeProjectKey(args.projectKey, resolveWorkspace(exec))
     const result = await context.repository.search({ ...args, projectKey })
+    if (result.records.length > 0) {
+      void context.repository.markReferenced(result.records.map(record => record.id)).catch(() => {
+        context.logger?.warn('dsh-hermes-memory: memory reference timestamp update skipped')
+      })
+    }
     return { success: true, operation: 'search', records: result.records, total: result.total }
   } catch (error) {
     return { success: false, operation: 'search', error: mapMemoryError(error) }
@@ -98,6 +106,41 @@ export async function removeMemory(args: { id: string }, _exec: ToolRunContext, 
     return { success: true, operation: 'remove', record }
   } catch (error) {
     return { success: false, operation: 'remove', error: mapMemoryError(error) }
+  }
+}
+
+export async function listMemory(args: {
+  scope?: MemoryScope
+  category?: MemoryCategory
+  projectKey?: string
+  limit?: number
+}, exec: ToolRunContext, context: ToolContext): Promise<MemoryToolResult> {
+  try {
+    const projectKey = args.projectKey === undefined ? currentProject(exec) : authorizeProjectKey(args.projectKey, resolveWorkspace(exec))
+    const result = await context.repository.list({ ...args, projectKey })
+    return {
+      success: true,
+      operation: 'list',
+      records: result.records.map(record => ({
+        ...record,
+        content: record.content.length <= MAX_LIST_CONTENT_CHARS
+          ? record.content
+          : `${record.content.slice(0, MAX_LIST_CONTENT_CHARS - 1)}…`,
+      })),
+      total: result.total,
+    }
+  } catch (error) {
+    return { success: false, operation: 'list', error: mapMemoryError(error) }
+  }
+}
+
+export async function statsMemory(args: { projectKey?: string }, exec: ToolRunContext, context: ToolContext): Promise<MemoryToolResult> {
+  try {
+    const projectKey = args.projectKey === undefined ? currentProject(exec) : authorizeProjectKey(args.projectKey, resolveWorkspace(exec))
+    const stats = await context.repository.getStats(projectKey)
+    return { success: true, operation: 'stats', stats }
+  } catch (error) {
+    return { success: false, operation: 'stats', error: mapMemoryError(error) }
   }
 }
 
