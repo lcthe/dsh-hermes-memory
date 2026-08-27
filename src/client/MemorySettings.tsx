@@ -43,6 +43,31 @@ export function MemorySettingsSection({ t, read, update }: Props): JSX.Element {
         <input type="number" min={0} max={3650} value={value.retentionDays} disabled={saving} onChange={event => void patch({ retentionDays: Number(event.target.value) })} />
       </label>
       <label className={css.row}>
+        <input type="checkbox" checked={value.automaticCapture} disabled={saving} onChange={event => void patch({ automaticCapture: event.target.checked })} />
+        <span>{t('automaticCapture')}</span>
+      </label>
+      {value.automaticCapture && (
+        <>
+          <label className={css.row}>
+            <input type="checkbox" checked={value.capturePreferences} disabled={saving} onChange={event => void patch({ capturePreferences: event.target.checked })} />
+            <span>{t('capturePreferences')}</span>
+          </label>
+          <label className={css.row}>
+            <input type="checkbox" checked={value.captureConventions} disabled={saving} onChange={event => void patch({ captureConventions: event.target.checked })} />
+            <span>{t('captureConventions')}</span>
+          </label>
+          <label className={css.row}>
+            <input type="checkbox" checked={value.captureCorrections} disabled={saving} onChange={event => void patch({ captureCorrections: event.target.checked })} />
+            <span>{t('captureCorrections')}</span>
+          </label>
+          <label className={css.field}>
+            <span>{t('captureMaxPerSession')}</span>
+            <input type="number" min={1} max={20} value={value.captureMaxPerSession} disabled={saving} onChange={event => void patch({ captureMaxPerSession: Number(event.target.value) })} />
+          </label>
+          <p className={css.note}>{t('captureNote')}</p>
+        </>
+      )}
+      <label className={css.row}>
         <input type="checkbox" checked={value.automaticInjection} disabled={saving} onChange={event => void patch({ automaticInjection: event.target.checked })} />
         <span>{t('automaticInjection')}</span>
       </label>
