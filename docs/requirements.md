@@ -277,17 +277,18 @@ V2 采用 DSH 原生 `session/event`、`session/flush` 和 `ctx.sessionQuery`，
 
 - 独立记忆管理 UI。记忆的查看、筛选、删除和修改由 agent 通过 `memory_list`、`memory_stats`、`memory_replace`、`memory_remove` 完成，不再建设浏览器端管理页面。
 
-### V5：后台模型复盘与安全候选写入（设计已完成，待实现）
+### V5：后台模型复盘与安全候选写入（已实现首个切片）
 
 - 在 `session/flush` 后异步使用 DSH subagent 结构化输出做记忆候选复盘；
 - 模型只返回 `operations` 候选，不直接调用记忆写入、替换或删除工具；
-- 新增独立 `reviews` 状态表，记录 requested/completed flush watermark 与 running/completed/failed 状态；
+- 使用现有 storage domain 增加独立 `reviews` 状态表，记录 requested/completed flush watermark 与 running/completed/failed 状态；
 - provider 不支持结构化输出时安全跳过，不降级为无约束文本 JSON 解析；
 - 所有候选重新经过 schema、workspace 授权、content-scanner、预算与幂等检查后才写入；
 - `ctx.jobs` 仅作为进程内执行器，不承担跨重启可靠队列；
 - teardown 取消并等待后台 subagent/jobs 释放，失败 fail-soft；
 - 不建设独立记忆管理 UI，不修改 DSH 源码，不复制 Pi 资产；
-- 新增设置默认关闭：`automaticReview`、`reviewMaxPerSession`、`reviewMaxInputChars`。
+- 新增设置默认关闭：`automaticReview`、`reviewMaxPerSession`、`reviewMaxInputChars`；
+- `jobs` 与 `subagents` 通过 `ctx.get()` 可选探测，未提供这些服务的 profile 仍可正常加载。
 
 详细设计和实现计划见：
 

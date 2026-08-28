@@ -4,7 +4,7 @@ DSH-native persistent memory, session-aware retrieval, and safe learning for Dee
 
 ## Status
 
-V4.2 is now implemented locally. Expired memories are cleaned by retention policy: non-failure records use `retentionDays` (90) and failure records use `failureRetentionDays` (30), anchored at `lastReferencedAt ?? updatedAt`. Cleanup runs at startup and on a throttled per-session basis, and can be disabled entirely. Background model review is designed and planned (V5) but not yet implemented; vector search remains deferred; a separate memory management UI is not planned.
+V4.2 is now implemented locally. Expired memories are cleaned by retention policy: non-failure records use `retentionDays` (90) and failure records use `failureRetentionDays` (30), anchored at `lastReferencedAt ?? updatedAt`. Cleanup runs at startup and on a throttled per-session basis, and can be disabled entirely. V5 background review is now implemented locally as an opt-in, fail-soft integration: when DSH `jobs` and structured-output `subagents` services are available, a post-flush review may save only validated candidates; vector search remains deferred; a separate memory management UI is not planned.
 
 ## Product boundary
 

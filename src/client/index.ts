@@ -49,6 +49,9 @@ export function apply(ctx: ClientContext): void {
         injectionMaxChars: 3000,
         includeUserMemory: true,
         includeProjectMemory: true,
+        automaticReview: false,
+        reviewMaxPerSession: 5,
+        reviewMaxInputChars: 12000,
       },
       update: async (patch: Partial<MemorySettings>) => {
         for (const [field, value] of Object.entries(patch)) await scope.set(field, value)

@@ -29,7 +29,7 @@
 - Create: `src/host/review-state.ts` — `reviews` 表访问与 watermark 幂等（纯函数 + 薄存储层）。
 - Create: `src/host/review-runner.ts` — session 投影、subagent 调用、候选处理与 fail-soft 结果。
 - Create: `src/host/auto-review.ts` — `session/flush` 监听、`ctx.jobs` 调度、取消与 teardown。
-- Modify: `src/host/storage-spec.ts` — 增加 `reviews` 表并升级 domain version 到 2。
+- Modify: `src/host/storage-spec.ts` — 增加 `reviews` 表，保持 domain version 1 以兼容现有存储（当前后端会将缺失的新表按空表加载）。
 - Modify: `src/host/storage.ts` — `openMemoryStorage` 提供 reviews 表访问。
 - Modify: `src/host/settings.ts` — 新增 `automaticReview`、`reviewMaxPerSession`、`reviewMaxInputChars` 及校验。
 - Modify: `src/index.ts` — 注入 `jobs`、`subagents`，安装 `auto-review`，teardown 释放。
@@ -124,7 +124,7 @@ export const reviewStateSchema = z.object({
 
 export const memoryDomainSpec = defineDomain({
   name: 'dsh_hermes_memory',
-  version: 2,
+  version: 1,
   tables: {
     memories: domainTable<string, MemoryRecord>(memoryRecordSchema),
     watermarks: domainTable<string, SessionWatermark>(sessionWatermarkSchema),

@@ -79,6 +79,23 @@ export function MemorySettingsSection({ t, read, update }: Props): JSX.Element {
             <input type="number" min={1} max={20} value={value.captureMaxPerSession} disabled={saving} onChange={event => void patch({ captureMaxPerSession: Number(event.target.value) })} />
           </label>
           <p className={css.note}>{t('captureNote')}</p>
+      <label className={css.row}>
+        <input type="checkbox" checked={value.automaticReview} disabled={saving} onChange={event => void patch({ automaticReview: event.target.checked })} />
+        <span>{t('automaticReview')}</span>
+      </label>
+      {value.automaticReview && (
+        <>
+          <label className={css.field}>
+            <span>{t('reviewMaxPerSession')}</span>
+            <input type="number" min={1} max={20} value={value.reviewMaxPerSession} disabled={saving} onChange={event => void patch({ reviewMaxPerSession: Number(event.target.value) })} />
+          </label>
+          <label className={css.field}>
+            <span>{t('reviewMaxInputChars')}</span>
+            <input type="number" min={2000} max={30000} value={value.reviewMaxInputChars} disabled={saving} onChange={event => void patch({ reviewMaxInputChars: Number(event.target.value) })} />
+          </label>
+          <p className={css.note}>{t('reviewNote')}</p>
+        </>
+      )}
         </>
       )}
       <label className={css.row}>

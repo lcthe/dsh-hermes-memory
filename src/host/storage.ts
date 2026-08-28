@@ -22,11 +22,13 @@ import type {
 } from '../core/types.ts'
 import type { MemoryRepository } from '../core/memory-repository.ts'
 import { TableWatermarkRepository, type WatermarkRepository } from './watermarks.ts'
+import { createReviewStateStore, type ReviewStateStore } from './review-state.ts'
 import { memoryDomainSpec } from './storage-spec.ts'
 
 export interface MemoryStorage {
   readonly table: KvTable<string, MemoryRecord>
   readonly watermarks: WatermarkRepository
+  readonly reviews: ReviewStateStore
   close(): Promise<void>
 }
 
@@ -36,6 +38,7 @@ export async function openMemoryStorage(ctx: Context): Promise<MemoryStorage> {
   return {
     table: domain.table('memories'),
     watermarks: new TableWatermarkRepository(domain.table('watermarks')),
+    reviews: createReviewStateStore(domain.table('reviews')),
     close: () => domain.close(),
   }
 }

@@ -24,6 +24,9 @@ export interface MemorySettings {
   injectionMaxChars: number
   includeUserMemory: boolean
   includeProjectMemory: boolean
+  automaticReview: boolean
+  reviewMaxPerSession: number
+  reviewMaxInputChars: number
 }
 
 export const MemorySettingsSchema: z<MemorySettings> = z.object({
@@ -44,9 +47,14 @@ export const MemorySettingsSchema: z<MemorySettings> = z.object({
   injectionMaxChars: z.number().default(3_000),
   includeUserMemory: z.boolean().default(true),
   includeProjectMemory: z.boolean().default(true),
+  automaticReview: z.boolean().default(false),
+  reviewMaxPerSession: z.number().default(5),
+  reviewMaxInputChars: z.number().default(12_000),
 })
 
 export function validateMemorySettings(value: MemorySettings): void {
+  const reviewMaxPerSession = value.reviewMaxPerSession ?? 5
+  const reviewMaxInputChars = value.reviewMaxInputChars ?? 12_000
   if (!Number.isInteger(value.defaultLimit) || value.defaultLimit < 1 || value.defaultLimit > 20) {
     throw new Error('memory defaultLimit must be an integer from 1 to 20')
   }
@@ -64,5 +72,11 @@ export function validateMemorySettings(value: MemorySettings): void {
   }
   if (!Number.isInteger(value.injectionMaxChars) || value.injectionMaxChars < 500 || value.injectionMaxChars > 8000) {
     throw new Error('memory injectionMaxChars must be an integer from 500 to 8000')
+  }
+  if (!Number.isInteger(reviewMaxPerSession) || reviewMaxPerSession < 1 || reviewMaxPerSession > 20) {
+    throw new Error('memory reviewMaxPerSession must be an integer from 1 to 20')
+  }
+  if (!Number.isInteger(reviewMaxInputChars) || reviewMaxInputChars < 2_000 || reviewMaxInputChars > 30_000) {
+    throw new Error('memory reviewMaxInputChars must be an integer from 2000 to 30000')
   }
 }

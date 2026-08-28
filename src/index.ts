@@ -7,6 +7,7 @@ import { installSessionCapture } from './host/session-capture.ts'
 import { installAutoCapture } from './host/auto-capture.ts'
 import { installMemoryInjection } from './host/memory-injection.ts'
 import { installRetention } from './host/retention.ts'
+import { installAutoReview } from './host/auto-review.ts'
 import { validateMemorySettings, MemorySettingsSchema, MEMORY_SETTINGS_NS } from './host/settings.ts'
 
 export const name = '@lcthe/dsh-hermes-memory'
@@ -24,6 +25,7 @@ export async function apply(ctx: Context): Promise<void> {
   const disposeAutoCapture = installAutoCapture(ctx, storage, repository, settings, ctx.logger)
   const disposeRetention = installRetention(ctx, storage, settings, ctx.logger)
   const disposeMemoryInjection = installMemoryInjection(ctx, storage, settings, ctx.logger, repository)
+  const disposeAutoReview = installAutoReview(ctx, storage, repository, settings, ctx.logger)
 
   let disposers: Array<() => void> = []
   const syncTools = (): void => {
@@ -40,6 +42,7 @@ export async function apply(ctx: Context): Promise<void> {
     disposeAutoCapture()
     disposeRetention()
     disposeMemoryInjection()
+    disposeAutoReview()
     for (const dispose of disposers) dispose()
   }, 'dshHermesMemory.tools')
 }
