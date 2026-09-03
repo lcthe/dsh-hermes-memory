@@ -7,7 +7,7 @@
 .description,
 .note {
   margin: 0;
-  color: var(--dsh-fg-secondary, #7d8492);
+  color: var(--dsw-alias-label-secondary);
   font-size: 13px;
   line-height: 1.5;
 }
@@ -18,7 +18,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  color: var(--dsh-fg-primary, #eceff4);
+  color: var(--dsw-alias-label-primary);
   font-size: 14px;
 }
 
