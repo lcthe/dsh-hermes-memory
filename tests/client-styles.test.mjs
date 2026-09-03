@@ -53,3 +53,14 @@ test('keeps settings groups quiet and avoids row-level dividers', async () => {
   assert.match(css, /border-top:\s*1px solid var\(--dsw-alias-border-l2\)/)
   assert.match(css, /\.rows[\s\S]*gap:\s*12px/)
 })
+
+test('uses native DSH input visuals for numeric settings', async () => {
+  const css = await readFile(cssPath, 'utf8')
+
+  assert.match(css, /\.field input\[type='number'\][\s\S]*height:\s*32px/)
+  assert.match(css, /\.field input\[type='number'\][\s\S]*border-radius:\s*8px/)
+  assert.match(css, /\.field input\[type='number'\][\s\S]*var\(--dsw-alias-bg-layer-1\)/)
+  assert.match(css, /\.field input\[type='number'\][\s\S]*var\(--dsw-alias-brand-primary\)/)
+  assert.match(css, /-webkit-inner-spin-button[\s\S]*-webkit-appearance:\s*none/)
+  assert.match(css, /appearance:\s*textfield/)
+})

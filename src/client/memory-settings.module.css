@@ -87,7 +87,35 @@
   box-sizing: border-box;
   flex: none;
   width: 96px;
+  height: 32px;
   min-height: 32px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 8px;
+  background: var(--dsw-alias-bg-layer-1);
+  padding: 0 8px;
+  color: var(--dsw-alias-label-primary);
+  font: inherit;
+  font-size: 14px;
+  line-height: 22px;
+  appearance: textfield;
+  -webkit-appearance: none;
+}
+
+.field input[type='number']::-webkit-inner-spin-button,
+.field input[type='number']::-webkit-outer-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+.field input[type='number']:focus-visible {
+  border-color: var(--dsw-alias-brand-primary);
+  outline: 2px solid var(--dsw-alias-brand-primary);
+  outline-offset: 1px;
+}
+
+.field input[type='number']:disabled {
+  cursor: default;
+  opacity: 0.4;
 }
 
 .switch {
