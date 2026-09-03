@@ -51,7 +51,12 @@ function ToggleRow({ label, checked, disabled, onChange }: ToggleRowProps): JSX.
   return (
     <label className={css.row}>
       <span className={css.rowCopy}>{label}</span>
-      <input type="checkbox" checked={checked} disabled={disabled} onChange={event => onChange(event.target.checked)} />
+      <span className={css.switch}>
+        <input type="checkbox" checked={checked} disabled={disabled} onChange={event => onChange(event.target.checked)} />
+        <span className={css.switchTrack} aria-hidden="true">
+          <span className={css.switchThumb} />
+        </span>
+      </span>
     </label>
   )
 }

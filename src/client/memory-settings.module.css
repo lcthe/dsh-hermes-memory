@@ -85,13 +85,6 @@
   flex: 1;
 }
 
-.row input[type='checkbox'] {
-  flex: none;
-  width: 16px;
-  height: 16px;
-  margin: 0;
-}
-
 .field input[type='number'] {
   box-sizing: border-box;
   flex: none;
@@ -99,10 +92,75 @@
   min-height: 32px;
 }
 
-.row input:focus-visible,
-.field input:focus-visible {
+.switch {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  width: 36px;
+  height: 20px;
+}
+
+.switch input {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+  opacity: 0;
+}
+
+.switchTrack {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 36px;
+  height: 20px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 10px;
+  background: var(--dsw-alias-interactive-bg-hover-solid);
+  padding: 2px;
+  transition: background-color 120ms ease-out, border-color 120ms ease-out;
+}
+
+.switchThumb {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--dsw-alias-label-secondary);
+  transition: transform 120ms ease-out, background-color 120ms ease-out;
+}
+
+.switch input:checked + .switchTrack {
+  border-color: var(--dsw-alias-state-success-primary);
+  background: var(--dsw-alias-state-success-primary);
+}
+
+.switch input:checked + .switchTrack .switchThumb {
+  background: var(--dsw-alias-label-primary-foreground);
+  transform: translateX(16px);
+}
+
+.switch input:focus-visible + .switchTrack {
   outline: 2px solid var(--dsw-alias-border-l3);
   outline-offset: 2px;
+}
+
+.switch input:disabled {
+  cursor: default;
+}
+
+.switch input:disabled + .switchTrack {
+  opacity: 0.4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switchTrack,
+  .switchThumb {
+    transition: none;
+  }
 }
 
 @media (max-width: 560px) {
@@ -115,7 +173,7 @@
     align-items: flex-start;
   }
 
-  .row input[type='checkbox'] {
+  .switch {
     margin-top: 3px;
   }
 

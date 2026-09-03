@@ -26,3 +26,17 @@ test('uses native settings groups and responsive layout rules', async () => {
   assert.match(css, /--dsw-alias-label-tertiary/)
   assert.doesNotMatch(css, /box-shadow:/)
 })
+
+test('renders accessible toggles with DSH switch visuals', async () => {
+  const [component, css] = await Promise.all([
+    readFile(new URL('../src/client/MemorySettings.tsx', import.meta.url), 'utf8'),
+    readFile(cssPath, 'utf8'),
+  ])
+
+  assert.match(component, /css\.switch\b/)
+  assert.match(component, /css\.switchTrack\b/)
+  assert.match(component, /css\.switchThumb\b/)
+  assert.match(css, /input:checked \+ \.switchTrack/)
+  assert.match(css, /input:focus-visible/)
+  assert.match(css, /--dsw-alias-state-success-primary/)
+})
