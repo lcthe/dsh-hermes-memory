@@ -7,8 +7,7 @@
   color: var(--dsw-alias-label-primary);
 }
 
-.description,
-.groupDescription {
+.description {
   margin: 0;
   color: var(--dsw-alias-label-tertiary);
   font-size: 13px;
@@ -57,11 +56,11 @@
 }
 
 .rows {
-  gap: 0;
+  gap: 12px;
 }
 
 .nested {
-  gap: 0;
+  gap: 8px;
   margin-left: 20px;
 }
 
@@ -72,7 +71,6 @@
   justify-content: space-between;
   gap: 16px;
   min-height: 44px;
-  border-bottom: 1px solid var(--dsw-alias-border-l3);
   padding: 10px 0;
   color: var(--dsw-alias-label-primary);
   font-size: 14px;

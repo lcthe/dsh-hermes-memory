@@ -18,7 +18,7 @@ test('uses native settings groups and responsive layout rules', async () => {
     readFile(cssPath, 'utf8'),
   ])
 
-  for (const className of ['group', 'groupHeader', 'groupTitle', 'groupDescription', 'rows', 'rowCopy', 'nested']) {
+  for (const className of ['group', 'groupHeader', 'groupTitle', 'rows', 'rowCopy', 'nested']) {
     assert.match(component, new RegExp(`css\\.${className}\\b`))
   }
   assert.match(css, /max-width:\s*720px/)
@@ -39,4 +39,17 @@ test('renders accessible toggles with DSH switch visuals', async () => {
   assert.match(css, /input:checked \+ \.switchTrack/)
   assert.match(css, /input:focus-visible/)
   assert.match(css, /--dsw-alias-state-success-primary/)
+})
+
+test('keeps settings groups quiet and avoids row-level dividers', async () => {
+  const [component, css] = await Promise.all([
+    readFile(new URL('../src/client/MemorySettings.tsx', import.meta.url), 'utf8'),
+    readFile(cssPath, 'utf8'),
+  ])
+
+  assert.doesNotMatch(component, /css\.groupDescription/)
+  assert.doesNotMatch(component, /css\.captureNote|css\.injectionNote|css\.reviewNote/)
+  assert.doesNotMatch(css, /border-bottom:/)
+  assert.match(css, /border-top:\s*1px solid var\(--dsw-alias-border-l2\)/)
+  assert.match(css, /\.rows[\s\S]*gap:\s*12px/)
 })
