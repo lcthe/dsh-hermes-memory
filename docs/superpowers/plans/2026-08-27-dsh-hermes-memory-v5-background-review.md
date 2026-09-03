@@ -1473,11 +1473,8 @@ npm pack --dry-run
 
 Expected：全部通过；打包不包含 Pi 资产。
 
-## 执行交接
+## 执行结果
 
-计划已保存到 `docs/superpowers/plans/2026-08-27-dsh-hermes-memory-v5-background-review.md`。执行选项：
+V5 首个切片已实现：后台复盘在 `session/flush` 后按设置异步调度，模型只返回经过 schema、workspace、scanner、预算和幂等校验的 `save` 候选；不支持所需服务时安全跳过，任务失败不影响主会话。
 
-1. **Subagent-Driven（推荐）**：每个任务派发新 subagent，任务间评审；
-2. **Inline Execution**：本会话内批量执行并设检查点。
-
-注意：按当前会话要求，本次只提交设计与计划文档，不执行代码任务。执行入口见该计划正文。
+当前仓库已通过 `npm test`、`npm run typecheck`、`npm run build` 和 `npm pack --dry-run` 验证；跨重启可靠队列、模型归并、向量检索和每步动态注入仍不在本切片范围内。

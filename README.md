@@ -57,7 +57,7 @@ This is a new DSH plugin. It does not copy Pi runtime code, Pi commands, Pi TUI,
 ## Deferred scope
 
 - Automatic prompt injection on every step.
-- Background model review and consolidation.
+- Model consolidation and automatic merge beyond the validated save-only review.
 - Vector or embedding retrieval.
 - Custom session database access.
 - Replacement of DSH chat UI or session shell.
@@ -65,7 +65,7 @@ This is a new DSH plugin. It does not copy Pi runtime code, Pi commands, Pi TUI,
 
 ## Development
 
-The V5 design (background model review with safe candidate writes) is documented and planned but not yet implemented:
+The V5 background review implementation and its safety constraints are documented here:
 
 - `docs/superpowers/specs/2026-08-27-dsh-hermes-memory-v5-background-review-design.md`
 - `docs/superpowers/plans/2026-08-27-dsh-hermes-memory-v5-background-review.md`
