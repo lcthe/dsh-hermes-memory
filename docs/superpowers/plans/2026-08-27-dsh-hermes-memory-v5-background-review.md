@@ -1410,7 +1410,7 @@ git commit -m "chore: add dsh jobs and subagent dependencies"
 在 `### V5` 位置补全：
 
 ```markdown
-### V5：会话复盘（设计已完成，待实现）
+### V5：会话复盘（已实现首个切片）
 
 - 在 `session/flush` 后异步使用 DSH subagent 结构化输出做记忆候选复盘；
 - 模型只返回 `operations` 候选，不直接调用记忆工具；
@@ -1424,8 +1424,8 @@ git commit -m "chore: add dsh jobs and subagent dependencies"
 
 - [ ] **Step 2: README 状态与 deferred 更新**
 
-- Status 段落增加“V5（后台模型复盘）已在本地完成设计，实现待启动”；
-- Deferred scope 保持“后台模型复盘”仍处于 deferred，直到实现完成前不改写为已完成。
+- Status 段落说明 V5 后台复盘首个切片已实现，并保留默认关闭和失败隔离语义；
+- Deferred scope 仅保留安全候选写入之外的模型归并和自动合并。
 
 - [ ] **Step 3: README.zh.md 同步**
 
