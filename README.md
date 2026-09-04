@@ -4,7 +4,7 @@ DSH-native persistent memory, session-aware retrieval, and safe learning for Dee
 
 ## Status
 
-V5 background review and V6 standing context are implemented locally. Standing profiles and instructions are explicitly saved, bounded, persisted in the DSH storage domain, and injected once at the start of each new session. The settings card controls the standing-context limits. V7 model consolidation and V8 reusable skill learning remain in progress.
+V5 background review, V6 standing context, and the V7 consolidation foundation are implemented locally. Standing profiles and instructions are explicitly saved, bounded, persisted in the DSH storage domain, and injected once at the start of each new session. V7 now has crash-safe plan state, replacement-before-retirement execution, structured model scheduling, and native settings. V8 now has storage-backed skills and a DSH-native provider; explicit skill tools and automatic learning remain in progress.
 
 ## Product boundary
 

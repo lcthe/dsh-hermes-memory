@@ -3,6 +3,7 @@ import { defineDomain, domainTable } from '@deepseek-ai/dsh-storage-domain'
 import type { MemoryRecord, SessionWatermark, StandingEntry } from '../core/types.ts'
 import type { ReviewState } from './review-types.ts'
 import type { ConsolidationState } from './consolidation-types.ts'
+import type { StoredSkill } from './skill-types.ts'
 
 export const memoryRecordSchema = z.object({
   id: z.string().min(1),
@@ -81,6 +82,12 @@ export const consolidationStateSchema = z.object({
   schemaVersion: z.literal(1),
 }) satisfies z.ZodType<ConsolidationState>
 
+export const storedSkillSchema = z.object({
+  id: z.string().min(1), name: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/), description: z.string().min(1).max(160), content: z.string().min(1).max(8000),
+  scope: z.union([z.literal('user'), z.literal('project')]), projectKey: z.string().min(1).optional(), createdAt: z.string().datetime(), updatedAt: z.string().datetime(),
+  provenance: z.object({ source: z.union([z.literal('explicit'), z.literal('session')]), sessionId: z.string().min(1).optional(), flushedSeq: z.number().int().nonnegative().optional() }), schemaVersion: z.literal(1),
+}) satisfies z.ZodType<StoredSkill>
+
 export const memoryDomainSpec = defineDomain({
   name: 'dsh_hermes_memory',
   version: 1,
@@ -90,5 +97,6 @@ export const memoryDomainSpec = defineDomain({
     watermarks: domainTable<string, SessionWatermark>(sessionWatermarkSchema),
     reviews: domainTable<string, ReviewState>(reviewStateSchema),
     consolidations: domainTable<string, ConsolidationState>(consolidationStateSchema),
+    skills: domainTable<string, StoredSkill>(storedSkillSchema),
   },
 })
