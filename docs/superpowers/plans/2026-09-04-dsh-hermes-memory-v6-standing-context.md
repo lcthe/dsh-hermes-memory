@@ -28,8 +28,8 @@
 - Create: `tests/standing-store.test.mjs`
 
 **Interfaces:**
-- Produces: `StandingEntry`, `StandingInput`, `StandingStore`, and `createStandingStore(table)`.
-- `StandingStore` exposes `add(input)`, `list()`, and `remove(id)`.
+- Produces: `StandingEntry`, `StandingInput`, `StandingLimits`, `StandingStore`, and `createStandingStore(table)`.
+- `StandingStore` exposes `add(input, limits)`, `list()`, and `remove(id)`; callers supply live settings and the store enforces immutable maxima.
 
 - [ ] **Step 1: Write failing repository tests**
 
@@ -66,13 +66,13 @@ export interface StandingEntry {
   schemaVersion: 1
 }
 export interface StandingStore {
-  add(input: StandingInput): Promise<StandingEntry>
+  add(input: StandingInput, limits: StandingLimits): Promise<StandingEntry>
   list(): Promise<StandingEntry[]>
   remove(id: string): Promise<StandingEntry>
 }
 ```
 
-Implement exact duplicate detection after trimming, safety scanning before writes, deterministic `kind/updatedAt/id` ordering, and limits of 20 entries, 2,000 total content characters, and 500 characters per entry. Add `standing` to `memoryDomainSpec` and expose it through `MemoryStorage`.
+Implement exact duplicate detection after trimming, safety scanning before writes, deterministic `kind/updatedAt/id` ordering, and immutable maxima of 20 entries, 2,000 total content characters, and 500 characters per entry. Reject supplied limits outside those maxima. Add `standing` to `memoryDomainSpec` and expose it through `MemoryStorage`.
 
 - [ ] **Step 4: Verify GREEN and commit**
 
@@ -133,7 +133,7 @@ export function installStandingInjection(
 ): () => boolean
 ```
 
-Render profile entries before instructions, use plugin source form `standing-context`, detect the same form in session history, and inject through `agent.inject()`. Tool descriptions must say `memory_pin` is used only after an explicit user request. Register and dispose all three tools through the existing settings-controlled tool lifecycle.
+Render profile entries before instructions, use plugin source form `standing-context`, detect the same form in session history, and inject through `agent.inject()`. Tool descriptions must say `memory_pin` is used only after an explicit user request. Pass the current `standingMaxEntries` and `standingMaxChars` settings to each add operation, and register and dispose all three tools through the existing settings-controlled tool lifecycle.
 
 - [ ] **Step 4: Verify GREEN and commit**
 
