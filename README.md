@@ -4,7 +4,7 @@ DSH-native persistent memory, session-aware retrieval, and safe learning for Dee
 
 ## Status
 
-V4.2 is now implemented locally. Expired memories are cleaned by retention policy: non-failure records use `retentionDays` (90) and failure records use `failureRetentionDays` (30), anchored at `lastReferencedAt ?? updatedAt`. Cleanup runs at startup and on a throttled per-session basis, and can be disabled entirely. V5 background review is now implemented locally as an opt-in, fail-soft integration: when DSH `jobs` and structured-output `subagents` services are available, a post-flush review may save only validated candidates; vector search remains deferred; a separate memory management UI is not planned.
+V5 background review and V6 standing context are implemented locally. Standing profiles and instructions are explicitly saved, bounded, persisted in the DSH storage domain, and injected once at the start of each new session. The settings card controls the standing-context limits. V7 model consolidation and V8 reusable skill learning remain in progress.
 
 ## Product boundary
 
@@ -57,11 +57,10 @@ This is a new DSH plugin. It does not copy Pi runtime code, Pi commands, Pi TUI,
 ## Deferred scope
 
 - Automatic prompt injection on every step.
-- Model consolidation and automatic merge beyond the validated save-only review.
 - Vector or embedding retrieval.
 - Custom session database access.
 - Replacement of DSH chat UI or session shell.
-- A separate memory management UI is not planned: view, filter, and remove memories through the built-in `memory_list`, `memory_stats`, `memory_replace`, and `memory_remove` tools instead.
+- A separate memory management UI is not planned: ordinary memories use the existing memory tools, while standing context is managed with `memory_pin`, `memory_pins`, and `memory_unpin`.
 
 ## Development
 

@@ -6,6 +6,7 @@ import { createMemoryTools } from './host/tool-definitions.ts'
 import { installSessionCapture } from './host/session-capture.ts'
 import { installAutoCapture } from './host/auto-capture.ts'
 import { installMemoryInjection } from './host/memory-injection.ts'
+import { installStandingInjection } from './host/standing-injection.ts'
 import { installRetention } from './host/retention.ts'
 import { installAutoReview } from './host/auto-review.ts'
 import { validateMemorySettings, MemorySettingsSchema, MEMORY_SETTINGS_NS } from './host/settings.ts'
@@ -20,11 +21,12 @@ export async function apply(ctx: Context): Promise<void> {
   })
   const storage = await openMemoryStorage(ctx)
   const repository = new StorageMemoryRepository(storage)
-  const tools = createMemoryTools({ repository, sessionQuery: ctx.sessionQuery, logger: ctx.logger })
+  const tools = createMemoryTools({ repository, sessionQuery: ctx.sessionQuery, standing: storage.standing, settings, logger: ctx.logger })
   const disposeSessionCapture = installSessionCapture(ctx, storage.watermarks)
   const disposeAutoCapture = installAutoCapture(ctx, storage, repository, settings, ctx.logger)
   const disposeRetention = installRetention(ctx, storage, settings, ctx.logger)
   const disposeMemoryInjection = installMemoryInjection(ctx, storage, settings, ctx.logger, repository)
+  const disposeStandingInjection = installStandingInjection(ctx, storage.standing, settings, ctx.logger)
   const disposeAutoReview = installAutoReview(ctx, storage, repository, settings, ctx.logger)
 
   let disposers: Array<() => void> = []
@@ -42,6 +44,7 @@ export async function apply(ctx: Context): Promise<void> {
     disposeAutoCapture()
     disposeRetention()
     disposeMemoryInjection()
+    disposeStandingInjection()
     disposeAutoReview()
     for (const dispose of disposers) dispose()
   }, 'dshHermesMemory.tools')

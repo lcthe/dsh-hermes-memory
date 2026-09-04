@@ -61,6 +61,15 @@ test('uses native settings cards and avoids row-level dividers', async () => {
   assert.match(css, /\.row,[\s\S]*\.field[\s\S]*padding:\s*6px 0/)
 })
 
+test('exposes standing context controls in the native settings card', async () => {
+  const component = await readFile(new URL('../src/client/MemorySettings.tsx', import.meta.url), 'utf8')
+
+  assert.match(component, /standingTitle/)
+  assert.match(component, /standingContextEnabled/)
+  assert.match(component, /standingMaxEntries/)
+  assert.match(component, /standingMaxChars/)
+})
+
 test('uses native DSH input visuals for numeric settings', async () => {
   const css = await readFile(cssPath, 'utf8')
 

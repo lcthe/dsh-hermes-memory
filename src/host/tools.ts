@@ -4,18 +4,22 @@ import type { MemoryRepository } from '../core/memory-repository.ts'
 import { MemoryBlockedError, MemoryNotFoundError } from '../core/memory-repository.ts'
 import { MemoryValidationError } from '../core/validation.ts'
 import type { MemoryCategory, MemoryScope } from '../core/types.ts'
+import type { StandingKind, StandingStore } from '../core/types.ts'
+import type { MemorySettings } from './settings.ts'
 import { MAX_LIST_CONTENT_CHARS } from '../core/validation.ts'
 import { authorizeProjectKey, resolveWorkspace } from './workspace.ts'
 
 export interface ToolContext {
   repository: MemoryRepository
   sessionQuery: SessionQueryEngine
+  standing?: StandingStore
+  settings?: { get(): MemorySettings }
   logger?: { warn(message: string): void }
 }
 
 export interface MemoryToolResult {
   success: boolean
-  operation: 'save' | 'search' | 'list' | 'stats' | 'replace' | 'remove'
+  operation: 'save' | 'search' | 'list' | 'stats' | 'replace' | 'remove' | 'standing-add' | 'standing-list' | 'standing-remove'
   record?: unknown
   records?: unknown[]
   total?: number
@@ -141,6 +145,52 @@ export async function statsMemory(args: { projectKey?: string }, exec: ToolRunCo
     return { success: true, operation: 'stats', stats }
   } catch (error) {
     return { success: false, operation: 'stats', error: mapMemoryError(error) }
+  }
+}
+
+function standingUnavailable(operation: MemoryToolResult['operation']): MemoryToolResult {
+  return { success: false, operation, error: { code: 'storage_unavailable', message: 'standing context storage is unavailable' } }
+}
+
+export async function pinStanding(args: {
+  kind: StandingKind
+  content: string
+}, exec: ToolRunContext, context: ToolContext): Promise<MemoryToolResult> {
+  if (!context.standing || !context.settings) return standingUnavailable('standing-add')
+  try {
+    const sessionId = currentSessionId(exec)
+    const value = context.settings.get()
+    const record = await context.standing.add({
+      kind: args.kind,
+      content: args.content,
+      provenance: { source: 'explicit', ...(sessionId ? { sessionId } : {}) },
+    }, {
+      maxEntries: value.standingMaxEntries ?? 20,
+      maxChars: value.standingMaxChars ?? 2_000,
+    })
+    return { success: true, operation: 'standing-add', record }
+  } catch (error) {
+    return { success: false, operation: 'standing-add', error: mapMemoryError(error) }
+  }
+}
+
+export async function listStanding(_args: Record<string, never>, _exec: ToolRunContext, context: ToolContext): Promise<MemoryToolResult> {
+  if (!context.standing) return standingUnavailable('standing-list')
+  try {
+    const records = await context.standing.list()
+    return { success: true, operation: 'standing-list', records, total: records.length }
+  } catch (error) {
+    return { success: false, operation: 'standing-list', error: mapMemoryError(error) }
+  }
+}
+
+export async function unpinStanding(args: { id: string }, _exec: ToolRunContext, context: ToolContext): Promise<MemoryToolResult> {
+  if (!context.standing) return standingUnavailable('standing-remove')
+  try {
+    const record = await context.standing.remove(args.id)
+    return { success: true, operation: 'standing-remove', record }
+  } catch (error) {
+    return { success: false, operation: 'standing-remove', error: mapMemoryError(error) }
   }
 }
 

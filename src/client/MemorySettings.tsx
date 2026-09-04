@@ -97,6 +97,16 @@ export function MemorySettingsSection({ t, read, update }: Props): JSX.Element {
         <NumberRow label={t('defaultLimit')} value={value.defaultLimit} min={1} max={20} disabled={saving} onChange={defaultLimit => void patch({ defaultLimit })} />
       </SettingsGroup>
 
+      <SettingsGroup title={t('standingTitle')} description={t('standingDescription')}>
+        <ToggleRow label={t('standingContextEnabled')} checked={value.standingContextEnabled} disabled={saving} onChange={standingContextEnabled => void patch({ standingContextEnabled })} />
+        {value.standingContextEnabled && (
+          <div className={css.nested}>
+            <NumberRow label={t('standingMaxEntries')} value={value.standingMaxEntries} min={1} max={20} disabled={saving} onChange={standingMaxEntries => void patch({ standingMaxEntries })} />
+            <NumberRow label={t('standingMaxChars')} value={value.standingMaxChars} min={100} max={2000} disabled={saving} onChange={standingMaxChars => void patch({ standingMaxChars })} />
+          </div>
+        )}
+      </SettingsGroup>
+
       <SettingsGroup title={t('captureTitle')} description={t('captureDescription')}>
         <ToggleRow label={t('automaticCapture')} checked={value.automaticCapture} disabled={saving} onChange={automaticCapture => void patch({ automaticCapture })} />
         {value.automaticCapture && (

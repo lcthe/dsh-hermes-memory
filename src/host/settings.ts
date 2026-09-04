@@ -24,6 +24,9 @@ export interface MemorySettings {
   injectionMaxChars: number
   includeUserMemory: boolean
   includeProjectMemory: boolean
+  standingContextEnabled: boolean
+  standingMaxEntries: number
+  standingMaxChars: number
   automaticReview: boolean
   reviewMaxPerSession: number
   reviewMaxInputChars: number
@@ -47,6 +50,9 @@ export const MemorySettingsSchema: z<MemorySettings> = z.object({
   injectionMaxChars: z.number().default(3_000),
   includeUserMemory: z.boolean().default(true),
   includeProjectMemory: z.boolean().default(true),
+  standingContextEnabled: z.boolean().default(true),
+  standingMaxEntries: z.number().default(20),
+  standingMaxChars: z.number().default(2_000),
   automaticReview: z.boolean().default(false),
   reviewMaxPerSession: z.number().default(5),
   reviewMaxInputChars: z.number().default(12_000),
@@ -55,6 +61,8 @@ export const MemorySettingsSchema: z<MemorySettings> = z.object({
 export function validateMemorySettings(value: MemorySettings): void {
   const reviewMaxPerSession = value.reviewMaxPerSession ?? 5
   const reviewMaxInputChars = value.reviewMaxInputChars ?? 12_000
+  const standingMaxEntries = value.standingMaxEntries ?? 20
+  const standingMaxChars = value.standingMaxChars ?? 2_000
   if (!Number.isInteger(value.defaultLimit) || value.defaultLimit < 1 || value.defaultLimit > 20) {
     throw new Error('memory defaultLimit must be an integer from 1 to 20')
   }
@@ -78,5 +86,11 @@ export function validateMemorySettings(value: MemorySettings): void {
   }
   if (!Number.isInteger(reviewMaxInputChars) || reviewMaxInputChars < 2_000 || reviewMaxInputChars > 30_000) {
     throw new Error('memory reviewMaxInputChars must be an integer from 2000 to 30000')
+  }
+  if (!Number.isInteger(standingMaxEntries) || standingMaxEntries < 1 || standingMaxEntries > 20) {
+    throw new Error('memory standingMaxEntries must be an integer from 1 to 20')
+  }
+  if (!Number.isInteger(standingMaxChars) || standingMaxChars < 100 || standingMaxChars > 2_000) {
+    throw new Error('memory standingMaxChars must be an integer from 100 to 2000')
   }
 }

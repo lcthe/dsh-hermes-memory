@@ -10,6 +10,9 @@ import {
   saveMemory,
   searchMemory,
   statsMemory,
+  listStanding,
+  pinStanding,
+  unpinStanding,
   type ToolContext,
 } from './tools.ts'
 
@@ -104,6 +107,30 @@ export function createMemoryTools(context: ToolContext) {
       },
       output: { schema: outputSchema, render: renderMemoryResult },
       execute: async (args, exec) => asJsonResult(await statsMemory(args, exec, context)),
+    }),
+    defineTool({
+      name: 'memory_pin',
+      description: 'Pin a user-approved profile or standing instruction for future DSH sessions. Use only after the user explicitly asks to remember it.',
+      parameters: {
+        kind: { type: 'string', enum: ['profile', 'instruction'], required: true },
+        content: { type: 'string', required: true },
+      },
+      output: { schema: outputSchema, render: renderMemoryResult },
+      execute: async (args, exec) => asJsonResult(await pinStanding(args, exec, context)),
+    }),
+    defineTool({
+      name: 'memory_pins',
+      description: 'List the bounded user-approved profile and standing instructions used at session start.',
+      parameters: {},
+      output: { schema: outputSchema, render: renderMemoryResult },
+      execute: async (args, exec) => asJsonResult(await listStanding(args, exec, context)),
+    }),
+    defineTool({
+      name: 'memory_unpin',
+      description: 'Remove one user-approved profile or standing instruction by stable ID.',
+      parameters: { id: { type: 'string', required: true } },
+      output: { schema: outputSchema, render: renderMemoryResult },
+      execute: async (args, exec) => asJsonResult(await unpinStanding(args, exec, context)),
     }),
   ]
 }

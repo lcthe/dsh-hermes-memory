@@ -20,6 +20,9 @@ const valid = {
   injectionMaxChars: 3000,
   includeUserMemory: true,
   includeProjectMemory: true,
+  standingContextEnabled: true,
+  standingMaxEntries: 20,
+  standingMaxChars: 2000,
   automaticReview: false,
   reviewMaxPerSession: 5,
   reviewMaxInputChars: 12000,
@@ -45,4 +48,8 @@ test('rejects unsafe setting limits', () => {
   assert.throws(() => validateMemorySettings({ ...valid, reviewMaxPerSession: 21 }), /reviewMaxPerSession/)
   assert.throws(() => validateMemorySettings({ ...valid, reviewMaxInputChars: 1999 }), /reviewMaxInputChars/)
   assert.throws(() => validateMemorySettings({ ...valid, reviewMaxInputChars: 30001 }), /reviewMaxInputChars/)
+  assert.throws(() => validateMemorySettings({ ...valid, standingMaxEntries: 0 }), /standingMaxEntries/)
+  assert.throws(() => validateMemorySettings({ ...valid, standingMaxEntries: 21 }), /standingMaxEntries/)
+  assert.throws(() => validateMemorySettings({ ...valid, standingMaxChars: 99 }), /standingMaxChars/)
+  assert.throws(() => validateMemorySettings({ ...valid, standingMaxChars: 2001 }), /standingMaxChars/)
 })

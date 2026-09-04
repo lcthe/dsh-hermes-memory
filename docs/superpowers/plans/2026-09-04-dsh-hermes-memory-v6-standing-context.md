@@ -133,7 +133,7 @@ export function installStandingInjection(
 ): () => boolean
 ```
 
-Render profile entries before instructions, use plugin source form `standing-context`, detect the same form in session history, and inject through `agent.inject()`. Tool descriptions must say `memory_pin` is used only after an explicit user request. Pass the current `standingMaxEntries` and `standingMaxChars` settings to each add operation, and register and dispose all three tools through the existing settings-controlled tool lifecycle.
+Render profile entries before instructions, use DSH's supported plugin source form `instructions` with the `[DSH standing context]` marker, detect that marker in session history, and inject through `agent.inject()`. Tool descriptions must say `memory_pin` is used only after an explicit user request. Pass the current `standingMaxEntries` and `standingMaxChars` settings to each add operation, and register and dispose all three tools through the existing settings-controlled tool lifecycle.
 
 - [ ] **Step 4: Verify GREEN and commit**
 
