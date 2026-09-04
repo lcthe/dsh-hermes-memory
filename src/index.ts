@@ -14,7 +14,7 @@ import { installMemorySkillProvider } from './host/memory-skill-provider.ts'
 import { validateMemorySettings, MemorySettingsSchema, MEMORY_SETTINGS_NS } from './host/settings.ts'
 
 export const name = '@lcthe/dsh-hermes-memory'
-export const inject = ['storageDomain', 'tools', 'settings', 'sessionQuery']
+export const inject = ['storageDomain', 'tools', 'settings', 'sessionQuery', 'skills']
 
 export async function apply(ctx: Context): Promise<void> {
   const settings = ctx.settings.register(MEMORY_SETTINGS_NS, MemorySettingsSchema, {
