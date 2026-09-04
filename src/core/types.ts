@@ -11,7 +11,7 @@ export const MEMORY_CATEGORIES = [
 ] as const
 export type MemoryCategory = (typeof MEMORY_CATEGORIES)[number]
 
-export type MemorySource = 'explicit' | 'session' | 'tool' | 'import'
+export type MemorySource = 'explicit' | 'session' | 'tool' | 'import' | 'consolidation'
 
 export interface MemoryProvenance {
   source: MemorySource

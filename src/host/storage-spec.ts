@@ -21,7 +21,7 @@ export const memoryRecordSchema = z.object({
   updatedAt: z.string().datetime(),
   lastReferencedAt: z.string().datetime().optional(),
   provenance: z.object({
-    source: z.union([z.literal('explicit'), z.literal('session'), z.literal('tool'), z.literal('import')]),
+    source: z.union([z.literal('explicit'), z.literal('session'), z.literal('tool'), z.literal('import'), z.literal('consolidation')]),
     sessionId: z.string().min(1).optional(),
     eventSeq: z.number().int().nonnegative().optional(),
     flushedSeq: z.number().int().nonnegative().optional(),
