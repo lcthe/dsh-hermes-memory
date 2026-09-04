@@ -42,6 +42,41 @@ export interface MemoryRecord {
   schemaVersion: 1
 }
 
+export type StandingKind = 'profile' | 'instruction'
+
+export interface StandingProvenance {
+  source: 'explicit'
+  sessionId?: string
+  eventSeq?: number
+}
+
+export interface StandingEntry {
+  id: string
+  kind: StandingKind
+  content: string
+  createdAt: string
+  updatedAt: string
+  provenance: StandingProvenance
+  schemaVersion: 1
+}
+
+export interface StandingInput {
+  kind: StandingKind
+  content: string
+  provenance?: StandingProvenance
+}
+
+export interface StandingLimits {
+  maxEntries: number
+  maxChars: number
+}
+
+export interface StandingStore {
+  add(input: StandingInput, limits: StandingLimits): Promise<StandingEntry>
+  list(): Promise<StandingEntry[]>
+  remove(id: string): Promise<StandingEntry>
+}
+
 export interface MemoryInput {
   scope: MemoryScope
   category: MemoryCategory

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { defineDomain, domainTable } from '@deepseek-ai/dsh-storage-domain'
-import type { MemoryRecord, SessionWatermark } from '../core/types.ts'
+import type { MemoryRecord, SessionWatermark, StandingEntry } from '../core/types.ts'
 import type { ReviewState } from './review-types.ts'
 
 export const memoryRecordSchema = z.object({
@@ -37,6 +37,20 @@ export const sessionWatermarkSchema = z.object({
   schemaVersion: z.literal(1),
 }) satisfies z.ZodType<SessionWatermark>
 
+export const standingEntrySchema = z.object({
+  id: z.string().min(1),
+  kind: z.union([z.literal('profile'), z.literal('instruction')]),
+  content: z.string().min(1).max(500),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+  provenance: z.object({
+    source: z.literal('explicit'),
+    sessionId: z.string().min(1).optional(),
+    eventSeq: z.number().int().nonnegative().optional(),
+  }),
+  schemaVersion: z.literal(1),
+}) satisfies z.ZodType<StandingEntry>
+
 export const reviewStateSchema = z.object({
   sessionId: z.string().min(1),
   requestedFlushedSeq: z.number().int().nonnegative(),
@@ -53,6 +67,7 @@ export const memoryDomainSpec = defineDomain({
   version: 1,
   tables: {
     memories: domainTable<string, MemoryRecord>(memoryRecordSchema),
+    standing: domainTable<string, StandingEntry>(standingEntrySchema),
     watermarks: domainTable<string, SessionWatermark>(sessionWatermarkSchema),
     reviews: domainTable<string, ReviewState>(reviewStateSchema),
   },
