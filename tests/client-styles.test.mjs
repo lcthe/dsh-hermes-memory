@@ -41,17 +41,24 @@ test('renders accessible toggles with DSH switch visuals', async () => {
   assert.match(css, /--dsw-alias-state-success-primary/)
 })
 
-test('keeps settings groups quiet and avoids row-level dividers', async () => {
+test('uses native settings cards and avoids row-level dividers', async () => {
   const [component, css] = await Promise.all([
     readFile(new URL('../src/client/MemorySettings.tsx', import.meta.url), 'utf8'),
     readFile(cssPath, 'utf8'),
   ])
 
-  assert.doesNotMatch(component, /css\.groupDescription/)
+  assert.match(component, /css\.groupDescription\b/)
+  assert.match(component, /aria-expanded=\{open\}/)
+  assert.match(component, /css\.chevron\b/)
   assert.doesNotMatch(component, /css\.captureNote|css\.injectionNote|css\.reviewNote/)
-  assert.doesNotMatch(css, /border-bottom:/)
-  assert.match(css, /border-top:\s*1px solid var\(--dsw-alias-border-l2\)/)
-  assert.match(css, /\.rows[\s\S]*gap:\s*12px/)
+  assert.doesNotMatch(css, /\.row,\s*\.field\s*\{[\s\S]*border-bottom:/)
+  assert.match(css, /\.group\s*\{[\s\S]*border:\s*1px solid var\(--dsw-alias-border-l2\)/)
+  assert.match(css, /\.group\s*\{[\s\S]*border-radius:\s*12px/)
+  assert.match(css, /\.groupBody\s*\{[\s\S]*border-top:\s*1px solid var\(--dsw-alias-border-l2\)/)
+  assert.match(css, /\.rows[\s\S]*gap:\s*8px/)
+  assert.match(css, /\.nested[\s\S]*gap:\s*8px/)
+  assert.match(css, /\.row,[\s\S]*\.field[\s\S]*box-sizing:\s*border-box/)
+  assert.match(css, /\.row,[\s\S]*\.field[\s\S]*padding:\s*6px 0/)
 })
 
 test('uses native DSH input visuals for numeric settings', async () => {

@@ -22,3 +22,10 @@
 - [x] 运行客户端测试、`npm run typecheck`、`npm run build` 和 `git diff --check`。
 - [x] 检查构建产物包含新 DSH token 且没有回退到旧的 `--dsh-fg-*` token。
 - [x] 提交为 `feat(client): polish memory number inputs`。
+
+### 任务 4：采用 DSH 原生设置卡片布局
+
+- [x] 在 `src/client/MemorySettings.tsx` 为设置分组增加说明、展开状态和键盘可访问的折叠按钮，基础记忆默认展开，其余分组默认收起。
+- [x] 在 `src/client/memory-settings.module.css` 增加 DSH 卡片边框、圆角、背景、分隔线和折叠箭头样式，保留即时保存和现有控件。
+- [x] 在 `tests/client-styles.test.mjs` 增加卡片结构和样式回归断言。
+- [x] 运行客户端测试、`npm run typecheck`、`npm run build` 和 `git diff --check`，然后提交卡片化布局改动。

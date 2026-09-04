@@ -15,6 +15,8 @@ type Props = PropsRuntime<'settings.section'> & PropsLocale<'hermes-memory'> & M
 
 interface SettingsGroupProps {
   title: string
+  description: string
+  defaultOpen?: boolean
   children: ReactNode
 }
 
@@ -34,14 +36,20 @@ interface NumberRowProps {
   onChange: (value: number) => void
 }
 
-function SettingsGroup({ title, children }: SettingsGroupProps): JSX.Element {
+function SettingsGroup({ title, description, defaultOpen = false, children }: SettingsGroupProps): JSX.Element {
+  const [open, setOpen] = useState(defaultOpen)
+
   return (
-    <div className={css.group}>
-      <header className={css.groupHeader}>
-        <h2 className={css.groupTitle}>{title}</h2>
-      </header>
-      <div className={css.rows}>{children}</div>
-    </div>
+    <section className={open ? `${css.group} ${css.groupOpen}` : css.group}>
+      <button type="button" className={css.groupHeader} aria-expanded={open} onClick={() => { setOpen(!open) }}>
+        <span className={css.groupText}>
+          <span className={css.groupTitle}>{title}</span>
+          <span className={css.groupDescription}>{description}</span>
+        </span>
+        <span className={open ? `${css.chevron} ${css.chevronOpen}` : css.chevron} aria-hidden="true" />
+      </button>
+      {open && <div className={css.groupBody}><div className={css.rows}>{children}</div></div>}
+    </section>
   )
 }
 
@@ -83,13 +91,13 @@ export function MemorySettingsSection({ t, read, update }: Props): JSX.Element {
     <section className={css.section}>
       <p className={css.description}>{t('description')}</p>
 
-      <SettingsGroup title={t('baseTitle')}>
+      <SettingsGroup title={t('baseTitle')} description={t('baseDescription')} defaultOpen>
         <ToggleRow label={t('enabled')} checked={value.enabled} disabled={saving} onChange={enabled => void patch({ enabled })} />
         <ToggleRow label={t('projectMemoryEnabled')} checked={value.projectMemoryEnabled} disabled={saving} onChange={projectMemoryEnabled => void patch({ projectMemoryEnabled })} />
         <NumberRow label={t('defaultLimit')} value={value.defaultLimit} min={1} max={20} disabled={saving} onChange={defaultLimit => void patch({ defaultLimit })} />
       </SettingsGroup>
 
-      <SettingsGroup title={t('captureTitle')}>
+      <SettingsGroup title={t('captureTitle')} description={t('captureDescription')}>
         <ToggleRow label={t('automaticCapture')} checked={value.automaticCapture} disabled={saving} onChange={automaticCapture => void patch({ automaticCapture })} />
         {value.automaticCapture && (
           <div className={css.nested}>
@@ -102,7 +110,7 @@ export function MemorySettingsSection({ t, read, update }: Props): JSX.Element {
         )}
       </SettingsGroup>
 
-      <SettingsGroup title={t('injectionTitle')}>
+      <SettingsGroup title={t('injectionTitle')} description={t('injectionDescription')}>
         <ToggleRow label={t('automaticInjection')} checked={value.automaticInjection} disabled={saving} onChange={automaticInjection => void patch({ automaticInjection })} />
         {value.automaticInjection && (
           <div className={css.nested}>
@@ -114,7 +122,7 @@ export function MemorySettingsSection({ t, read, update }: Props): JSX.Element {
         )}
       </SettingsGroup>
 
-      <SettingsGroup title={t('lifecycleTitle')}>
+      <SettingsGroup title={t('lifecycleTitle')} description={t('lifecycleDescription')}>
         <ToggleRow label={t('retentionEnabled')} checked={value.retentionEnabled} disabled={saving} onChange={retentionEnabled => void patch({ retentionEnabled })} />
         {value.retentionEnabled && (
           <div className={css.nested}>
