@@ -5,13 +5,23 @@ import { memoryDomainSpec } from '../src/host/storage-spec.ts'
 
 const limits = { maxEntries: 20, maxChars: 2_000 }
 
-function createTable(initial = []) {
+function createTable(initial = [], options = {}) {
   const records = new Map(initial.map((entry) => [entry.id, structuredClone(entry)]))
+  let releaseFirstPut
+  const firstPutGate = new Promise((resolve) => { releaseFirstPut = resolve })
+  let shouldBlockFirstPut = options.blockFirstPut === true
   return {
     get: (key) => records.get(key),
     entries: () => [...records.entries()][Symbol.iterator](),
-    put: async (key, value) => { records.set(key, structuredClone(value)) },
+    put: async (key, value) => {
+      if (shouldBlockFirstPut) {
+        shouldBlockFirstPut = false
+        await firstPutGate
+      }
+      records.set(key, structuredClone(value))
+    },
     delete: async (key) => records.delete(key),
+    releaseFirstPut: () => { releaseFirstPut() },
     get size() { return records.size },
   }
 }
@@ -85,5 +95,21 @@ test('enforces live limits without allowing them above immutable maxima', async 
   await assert.rejects(() => store.add({ kind: 'profile', content: 'second' }, { maxEntries: 1, maxChars: 100 }))
   await assert.rejects(() => store.add({ kind: 'profile', content: 'x' }, { maxEntries: 21, maxChars: 2_000 }))
   await assert.rejects(() => store.add({ kind: 'profile', content: 'x' }, { maxEntries: 20, maxChars: 2_001 }))
+  assert.equal((await store.list()).length, 1)
+})
+
+test('snapshots limits before queued writes execute', async () => {
+  const table = createTable([], { blockFirstPut: true })
+  const store = createStandingStore(table)
+  const limits = { maxEntries: 1, maxChars: 2_000 }
+
+  const first = store.add({ kind: 'profile', content: 'first' }, limits)
+  const second = store.add({ kind: 'profile', content: 'second' }, limits)
+  limits.maxEntries = 20
+  limits.maxChars = 2_000
+  table.releaseFirstPut()
+
+  await first
+  await assert.rejects(() => second)
   assert.equal((await store.list()).length, 1)
 })

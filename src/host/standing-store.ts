@@ -48,7 +48,7 @@ function validateLimits(limits: StandingLimits): StandingLimits {
   if (!Number.isSafeInteger(limits.maxChars) || limits.maxChars < 1 || limits.maxChars > MAX_STANDING_CHARS) {
     throw new MemoryValidationError(`standing character budget must be an integer from 1 to ${MAX_STANDING_CHARS}`)
   }
-  return limits
+  return { maxEntries: limits.maxEntries, maxChars: limits.maxChars }
 }
 
 function compareEntries(left: StandingEntry, right: StandingEntry): number {
