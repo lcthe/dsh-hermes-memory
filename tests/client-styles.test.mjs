@@ -70,6 +70,14 @@ test('exposes standing context controls in the native settings card', async () =
   assert.match(component, /standingMaxChars/)
 })
 
+test('exposes consolidation controls in a collapsible settings card', async () => {
+  const component = await readFile(new URL('../src/client/MemorySettings.tsx', import.meta.url), 'utf8')
+  assert.match(component, /consolidationTitle/)
+  assert.match(component, /automaticConsolidation/)
+  assert.match(component, /consolidationThresholdChars/)
+  assert.match(component, /consolidationTargetChars/)
+})
+
 test('uses native DSH input visuals for numeric settings', async () => {
   const css = await readFile(cssPath, 'utf8')
 

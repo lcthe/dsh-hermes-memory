@@ -23,6 +23,11 @@ const valid = {
   standingContextEnabled: true,
   standingMaxEntries: 20,
   standingMaxChars: 2000,
+  automaticConsolidation: false,
+  consolidationThresholdChars: 40000,
+  consolidationTargetChars: 28000,
+  consolidationMaxRecords: 100,
+  consolidationMaxReplacements: 20,
   automaticReview: false,
   reviewMaxPerSession: 5,
   reviewMaxInputChars: 12000,
@@ -52,4 +57,8 @@ test('rejects unsafe setting limits', () => {
   assert.throws(() => validateMemorySettings({ ...valid, standingMaxEntries: 21 }), /standingMaxEntries/)
   assert.throws(() => validateMemorySettings({ ...valid, standingMaxChars: 99 }), /standingMaxChars/)
   assert.throws(() => validateMemorySettings({ ...valid, standingMaxChars: 2001 }), /standingMaxChars/)
+  assert.throws(() => validateMemorySettings({ ...valid, consolidationThresholdChars: 999 }), /consolidationThresholdChars/)
+  assert.throws(() => validateMemorySettings({ ...valid, consolidationTargetChars: 40000 }), /consolidationTargetChars/)
+  assert.throws(() => validateMemorySettings({ ...valid, consolidationMaxRecords: 101 }), /consolidationMaxRecords/)
+  assert.throws(() => validateMemorySettings({ ...valid, consolidationMaxReplacements: 21 }), /consolidationMaxReplacements/)
 })

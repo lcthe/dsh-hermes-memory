@@ -27,6 +27,11 @@ export interface MemorySettings {
   standingContextEnabled: boolean
   standingMaxEntries: number
   standingMaxChars: number
+  automaticConsolidation: boolean
+  consolidationThresholdChars: number
+  consolidationTargetChars: number
+  consolidationMaxRecords: number
+  consolidationMaxReplacements: number
   automaticReview: boolean
   reviewMaxPerSession: number
   reviewMaxInputChars: number
@@ -53,6 +58,11 @@ export const MemorySettingsSchema: z<MemorySettings> = z.object({
   standingContextEnabled: z.boolean().default(true),
   standingMaxEntries: z.number().default(20),
   standingMaxChars: z.number().default(2_000),
+  automaticConsolidation: z.boolean().default(false),
+  consolidationThresholdChars: z.number().default(40_000),
+  consolidationTargetChars: z.number().default(28_000),
+  consolidationMaxRecords: z.number().default(100),
+  consolidationMaxReplacements: z.number().default(20),
   automaticReview: z.boolean().default(false),
   reviewMaxPerSession: z.number().default(5),
   reviewMaxInputChars: z.number().default(12_000),
@@ -63,6 +73,10 @@ export function validateMemorySettings(value: MemorySettings): void {
   const reviewMaxInputChars = value.reviewMaxInputChars ?? 12_000
   const standingMaxEntries = value.standingMaxEntries ?? 20
   const standingMaxChars = value.standingMaxChars ?? 2_000
+  const consolidationThresholdChars = value.consolidationThresholdChars ?? 40_000
+  const consolidationTargetChars = value.consolidationTargetChars ?? 28_000
+  const consolidationMaxRecords = value.consolidationMaxRecords ?? 100
+  const consolidationMaxReplacements = value.consolidationMaxReplacements ?? 20
   if (!Number.isInteger(value.defaultLimit) || value.defaultLimit < 1 || value.defaultLimit > 20) {
     throw new Error('memory defaultLimit must be an integer from 1 to 20')
   }
@@ -92,5 +106,17 @@ export function validateMemorySettings(value: MemorySettings): void {
   }
   if (!Number.isInteger(standingMaxChars) || standingMaxChars < 100 || standingMaxChars > 2_000) {
     throw new Error('memory standingMaxChars must be an integer from 100 to 2000')
+  }
+  if (!Number.isInteger(consolidationThresholdChars) || consolidationThresholdChars < 1_000 || consolidationThresholdChars > 1_000_000) {
+    throw new Error('memory consolidationThresholdChars must be an integer from 1000 to 1000000')
+  }
+  if (!Number.isInteger(consolidationTargetChars) || consolidationTargetChars < 1_000 || consolidationTargetChars >= consolidationThresholdChars) {
+    throw new Error('memory consolidationTargetChars must be below consolidationThresholdChars')
+  }
+  if (!Number.isInteger(consolidationMaxRecords) || consolidationMaxRecords < 2 || consolidationMaxRecords > 100) {
+    throw new Error('memory consolidationMaxRecords must be an integer from 2 to 100')
+  }
+  if (!Number.isInteger(consolidationMaxReplacements) || consolidationMaxReplacements < 1 || consolidationMaxReplacements > 20) {
+    throw new Error('memory consolidationMaxReplacements must be an integer from 1 to 20')
   }
 }

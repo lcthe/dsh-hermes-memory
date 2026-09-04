@@ -107,6 +107,18 @@ export function MemorySettingsSection({ t, read, update }: Props): JSX.Element {
         )}
       </SettingsGroup>
 
+      <SettingsGroup title={t('consolidationTitle')} description={t('consolidationDescription')}>
+        <ToggleRow label={t('automaticConsolidation')} checked={value.automaticConsolidation} disabled={saving} onChange={automaticConsolidation => void patch({ automaticConsolidation })} />
+        {value.automaticConsolidation && (
+          <div className={css.nested}>
+            <NumberRow label={t('consolidationThresholdChars')} value={value.consolidationThresholdChars} min={1000} max={1000000} disabled={saving} onChange={consolidationThresholdChars => void patch({ consolidationThresholdChars })} />
+            <NumberRow label={t('consolidationTargetChars')} value={value.consolidationTargetChars} min={1000} max={999999} disabled={saving} onChange={consolidationTargetChars => void patch({ consolidationTargetChars })} />
+            <NumberRow label={t('consolidationMaxRecords')} value={value.consolidationMaxRecords} min={2} max={100} disabled={saving} onChange={consolidationMaxRecords => void patch({ consolidationMaxRecords })} />
+            <NumberRow label={t('consolidationMaxReplacements')} value={value.consolidationMaxReplacements} min={1} max={20} disabled={saving} onChange={consolidationMaxReplacements => void patch({ consolidationMaxReplacements })} />
+          </div>
+        )}
+      </SettingsGroup>
+
       <SettingsGroup title={t('captureTitle')} description={t('captureDescription')}>
         <ToggleRow label={t('automaticCapture')} checked={value.automaticCapture} disabled={saving} onChange={automaticCapture => void patch({ automaticCapture })} />
         {value.automaticCapture && (
