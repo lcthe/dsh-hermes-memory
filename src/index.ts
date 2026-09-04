@@ -9,6 +9,7 @@ import { installMemoryInjection } from './host/memory-injection.ts'
 import { installStandingInjection } from './host/standing-injection.ts'
 import { installRetention } from './host/retention.ts'
 import { installAutoReview } from './host/auto-review.ts'
+import { installAutoConsolidation } from './host/auto-consolidation.ts'
 import { validateMemorySettings, MemorySettingsSchema, MEMORY_SETTINGS_NS } from './host/settings.ts'
 
 export const name = '@lcthe/dsh-hermes-memory'
@@ -28,6 +29,7 @@ export async function apply(ctx: Context): Promise<void> {
   const disposeMemoryInjection = installMemoryInjection(ctx, storage, settings, ctx.logger, repository)
   const disposeStandingInjection = installStandingInjection(ctx, storage.standing, settings, ctx.logger)
   const disposeAutoReview = installAutoReview(ctx, storage, repository, settings, ctx.logger)
+  const disposeAutoConsolidation = installAutoConsolidation(ctx, storage, repository, settings, ctx.logger)
 
   let disposers: Array<() => void> = []
   const syncTools = (): void => {
@@ -46,6 +48,7 @@ export async function apply(ctx: Context): Promise<void> {
     disposeMemoryInjection()
     disposeStandingInjection()
     disposeAutoReview()
+    disposeAutoConsolidation()
     for (const dispose of disposers) dispose()
   }, 'dshHermesMemory.tools')
 }
