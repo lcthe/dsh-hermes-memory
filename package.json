@@ -1,6 +1,6 @@
 {
   "name": "@lcthe/dsh-hermes-memory",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "DSH-native persistent memory and safe session-aware retrieval plugin.",
   "keywords": [
     "deepseek",
