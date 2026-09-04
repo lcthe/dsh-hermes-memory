@@ -26,12 +26,15 @@ import { createReviewStateStore, type ReviewStateStore } from './review-state.ts
 import { createStandingStore } from './standing-store.ts'
 import type { StandingStore } from '../core/types.ts'
 import { memoryDomainSpec } from './storage-spec.ts'
+import { createConsolidationStateStore } from './consolidation-state.ts'
+import type { ConsolidationStateStore } from './consolidation-types.ts'
 
 export interface MemoryStorage {
   readonly table: KvTable<string, MemoryRecord>
   readonly standing: StandingStore
   readonly watermarks: WatermarkRepository
   readonly reviews: ReviewStateStore
+  readonly consolidations: ConsolidationStateStore
   close(): Promise<void>
 }
 
@@ -43,6 +46,7 @@ export async function openMemoryStorage(ctx: Context): Promise<MemoryStorage> {
     standing: createStandingStore(domain.table('standing')),
     watermarks: new TableWatermarkRepository(domain.table('watermarks')),
     reviews: createReviewStateStore(domain.table('reviews')),
+    consolidations: createConsolidationStateStore(domain.table('consolidations')),
     close: () => domain.close(),
   }
 }

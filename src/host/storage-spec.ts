@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { defineDomain, domainTable } from '@deepseek-ai/dsh-storage-domain'
 import type { MemoryRecord, SessionWatermark, StandingEntry } from '../core/types.ts'
 import type { ReviewState } from './review-types.ts'
+import type { ConsolidationState } from './consolidation-types.ts'
 
 export const memoryRecordSchema = z.object({
   id: z.string().min(1),
@@ -62,6 +63,24 @@ export const reviewStateSchema = z.object({
   schemaVersion: z.literal(1),
 }) satisfies z.ZodType<ReviewState>
 
+export const consolidationStateSchema = z.object({
+  id: z.string().min(1),
+  scope: z.union([z.literal('global'), z.literal('user'), z.literal('project'), z.literal('failure')]),
+  projectKey: z.string().min(1).optional(),
+  groups: z.array(z.object({
+    sourceIds: z.array(z.string().min(1)).min(2),
+    category: z.union([
+      z.literal('preference'), z.literal('convention'), z.literal('insight'),
+      z.literal('failure'), z.literal('correction'), z.literal('tool-quirk'),
+    ]),
+    content: z.string().min(1).max(2_000),
+  })).max(20),
+  sourceVersions: z.record(z.string(), z.string()),
+  status: z.union([z.literal('prepared'), z.literal('replacements-written'), z.literal('completed'), z.literal('failed')]),
+  updatedAt: z.string().datetime(),
+  schemaVersion: z.literal(1),
+}) satisfies z.ZodType<ConsolidationState>
+
 export const memoryDomainSpec = defineDomain({
   name: 'dsh_hermes_memory',
   version: 1,
@@ -70,5 +89,6 @@ export const memoryDomainSpec = defineDomain({
     standing: domainTable<string, StandingEntry>(standingEntrySchema),
     watermarks: domainTable<string, SessionWatermark>(sessionWatermarkSchema),
     reviews: domainTable<string, ReviewState>(reviewStateSchema),
+    consolidations: domainTable<string, ConsolidationState>(consolidationStateSchema),
   },
 })
