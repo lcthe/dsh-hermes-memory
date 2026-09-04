@@ -71,11 +71,16 @@ test('exposes standing context controls in the native settings card', async () =
 })
 
 test('exposes consolidation controls in a collapsible settings card', async () => {
-  const component = await readFile(new URL('../src/client/MemorySettings.tsx', import.meta.url), 'utf8')
+  const [component, entry] = await Promise.all([
+    readFile(new URL('../src/client/MemorySettings.tsx', import.meta.url), 'utf8'),
+    readFile(new URL('../src/client/index.ts', import.meta.url), 'utf8'),
+  ])
   assert.match(component, /consolidationTitle/)
   assert.match(component, /automaticConsolidation/)
   assert.match(component, /consolidationThresholdChars/)
   assert.match(component, /consolidationTargetChars/)
+  assert.match(entry, /DEFAULT_MEMORY_SETTINGS/)
+  assert.match(entry, /\.\.\.DEFAULT_MEMORY_SETTINGS, \.\.\.scope\.getSnapshot\(\)\.value/)
 })
 
 test('uses native DSH input visuals for numeric settings', async () => {

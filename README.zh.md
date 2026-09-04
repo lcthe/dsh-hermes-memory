@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-V4.2 已在本地实现。过期记忆会按保留策略清理：普通记忆用 `retentionDays`（90 天），失败记忆用 `failureRetentionDays`（30 天），基准为 `lastReferencedAt ?? updatedAt`。清理在启动时执行一次，并随会话启动按进程内每小时节流执行，可整体关闭。V5 后台复盘已在本地实现为默认关闭、失败隔离的可选能力：只有 DSH 提供 `jobs` 和结构化输出 `subagents` 服务时，flush 后才会尝试生成候选，且只能写入通过 Host 校验的记忆；向量检索仍然延期；独立记忆管理 UI 不在路线内。
+V5 后台复盘、V6 常驻上下文和 V7 自动合并基础已实现。用户画像与常驻指令会显式保存到 DSH storage-domain，并在每个新会话启动时注入一次；设置页可以控制其预算。V7 已包含崩溃安全的合并状态、替代记录先写后删、结构化模型调度和合并设置。V8 已包含本地技能存储和 DSH 原生技能 Provider；技能管理工具和复杂会话自动学习仍在继续开发。
 
 ## 项目边界
 
@@ -21,15 +21,18 @@ V4.2 已在本地实现。过期记忆会按保留策略清理：普通记忆用
 - V4 规则型会话捕获（偏好/约定/纠正，默认关闭）；
 - V4.1 纠正与同轮失败工具调用的关联捕获（tool-quirk，默认开启但受自动捕获总开关控制）；
 - V4.2 过期记忆清理（`retentionDays`/`failureRetentionDays`，启动 + 会话节流清扫）。
+- V5 后台模型复盘（默认关闭，受结构化输出和 Host 安全校验约束）。
+- V6 常驻上下文：`memory_pin`、`memory_pins`、`memory_unpin`，支持用户画像和长期指令跨会话注入。
+- V7 自动合并基础：阈值调度、持久化状态、替代记录先写后删和启动恢复。
+- V8 本地技能存储和 DSH 原生技能 Provider，支持 user/project 隔离。
 
 ## 暂不实现
 
 - 每一步自动注入；
-- 超出安全候选写入范围的模型归并和自动合并；
 - 向量或 embedding 检索；
 - 自定义会话数据库；
 - 替换 DSH 聊天界面或设置 shell；
-- 独立记忆管理 UI 不在路线内：记忆的查看、筛选和删除通过内置 `memory_list`、`memory_stats`、`memory_replace`、`memory_remove` 工具由 agent 完成。
+- 独立记忆管理 UI 不在路线内：普通记忆使用现有 memory 工具，常驻上下文使用 `memory_pin`、`memory_pins`、`memory_unpin` 管理。
 
 ## 文档
 

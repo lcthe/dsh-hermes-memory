@@ -17,6 +17,37 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
 
 export const inject = ['slots', 'locale', 'settingsScope']
 
+const DEFAULT_MEMORY_SETTINGS: MemorySettings = {
+  enabled: true,
+  defaultLimit: 8,
+  projectMemoryEnabled: true,
+  automaticCapture: false,
+  capturePreferences: true,
+  captureConventions: true,
+  captureCorrections: true,
+  captureToolContext: true,
+  captureMaxPerSession: 5,
+  retentionEnabled: true,
+  retentionDays: 90,
+  failureRetentionDays: 30,
+  automaticInjection: false,
+  injectionLimit: 5,
+  injectionMaxChars: 3000,
+  includeUserMemory: true,
+  includeProjectMemory: true,
+  standingContextEnabled: true,
+  standingMaxEntries: 20,
+  standingMaxChars: 2000,
+  automaticConsolidation: false,
+  consolidationThresholdChars: 40000,
+  consolidationTargetChars: 28000,
+  consolidationMaxRecords: 100,
+  consolidationMaxReplacements: 20,
+  automaticReview: false,
+  reviewMaxPerSession: 5,
+  reviewMaxInputChars: 12000,
+}
+
 export function apply(ctx: ClientContext): void {
   ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'dsh-hermes-memory: dictionaries')
   const t = ctx.locale.bind(NS)
@@ -31,36 +62,7 @@ export function apply(ctx: ClientContext): void {
     locale: NS,
     inject: () => ({
       t,
-      read: () => scope.getSnapshot().value ?? {
-        enabled: true,
-        defaultLimit: 8,
-        projectMemoryEnabled: true,
-        automaticCapture: false,
-        capturePreferences: true,
-        captureConventions: true,
-        captureCorrections: true,
-        captureToolContext: true,
-        captureMaxPerSession: 5,
-        retentionEnabled: true,
-        retentionDays: 90,
-        failureRetentionDays: 30,
-        automaticInjection: false,
-        injectionLimit: 5,
-        injectionMaxChars: 3000,
-        includeUserMemory: true,
-        includeProjectMemory: true,
-        standingContextEnabled: true,
-        standingMaxEntries: 20,
-        standingMaxChars: 2000,
-        automaticConsolidation: false,
-        consolidationThresholdChars: 40000,
-        consolidationTargetChars: 28000,
-        consolidationMaxRecords: 100,
-        consolidationMaxReplacements: 20,
-        automaticReview: false,
-        reviewMaxPerSession: 5,
-        reviewMaxInputChars: 12000,
-      },
+      read: () => ({ ...DEFAULT_MEMORY_SETTINGS, ...scope.getSnapshot().value }),
       update: async (patch: Partial<MemorySettings>) => {
         for (const [field, value] of Object.entries(patch)) await scope.set(field, value)
       },
