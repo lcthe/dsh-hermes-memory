@@ -1,13 +1,14 @@
 import { createUserMessage, type UserMessage } from '@deepseek-ai/dsh-llm'
 import type { Context } from '@deepseek-ai/cordis'
-import type { StandingEntry, StandingStore } from '../core/types.ts'
+// Type-only: pulls the `agent/created` Context merge into this program.
+import type {} from '@deepseek-ai/dsh-agent'
+import type { HermesMemoryMessageSource, StandingEntry, StandingStore } from '../core/types.ts'
 import type { MemorySettings } from './settings.ts'
 
 const MAX_STANDING_ENTRIES = 20
 const MAX_STANDING_CHARS = 2_000
-const PLUGIN_NAME = '@lcthe/dsh-hermes-memory'
-// DSH accepts a fixed set of plugin message forms. The header below keeps
-// this injection distinguishable from other instruction messages on resume.
+// DSH accepts a fixed set of context forms. The header below keeps this
+// injection distinguishable from other instruction messages on resume.
 const SOURCE_FORM = 'instructions'
 
 function validEntry(value: unknown): value is StandingEntry {
@@ -53,19 +54,18 @@ export function renderStandingText(entries: readonly StandingEntry[], maxChars: 
 interface StandingAgent {
   readonly session: {
     readonly surface?: { readonly nodes: readonly number[] }
-    readonly events?: Record<number, unknown>
+    eventAt?(seq: number): unknown
   }
   inject(message: UserMessage): void
 }
 
 function alreadyInjected(agent: StandingAgent): boolean {
   for (const seq of agent.session.surface?.nodes ?? []) {
-    const event = agent.session.events?.[seq]
+    const event = agent.session.eventAt?.(seq)
     if (typeof event !== 'object' || event === null) continue
-    const candidate = event as { type?: unknown; data?: { content?: Array<{ type?: unknown; text?: unknown }>; source?: { kind?: unknown; plugin?: unknown; form?: unknown } } }
+    const candidate = event as { type?: unknown; data?: { content?: Array<{ type?: unknown; text?: unknown }>; source?: Partial<HermesMemoryMessageSource> } }
     if (candidate.type === 'user/message'
-      && candidate.data?.source?.kind === 'plugin'
-      && candidate.data.source.plugin === PLUGIN_NAME
+      && candidate.data?.source?.kind === 'hermes-memory'
       && candidate.data.source.form === SOURCE_FORM
       && candidate.data.content?.some(part => part.type === 'text' && typeof part.text === 'string' && part.text.includes('[DSH standing context]'))) return true
   }
@@ -79,7 +79,7 @@ export function installStandingInjection(
   logger: { warn(message: string): void },
 ): () => boolean {
   const injected = new WeakSet<object>()
-  return ctx.on('agent/session-start', ({ agent }) => {
+  return ctx.on('agent/created', ({ agent }) => {
     if (injected.has(agent)) return
     injected.add(agent)
     const value = settings.get()
@@ -89,7 +89,7 @@ export function installStandingInjection(
       if (text === undefined) return
       agent.inject(createUserMessage({
         content: [{ type: 'text', text }],
-        source: { kind: 'plugin', plugin: PLUGIN_NAME, form: SOURCE_FORM },
+        source: { kind: 'hermes-memory', form: SOURCE_FORM },
       }))
     }).catch(() => {
       logger.warn('dsh-hermes-memory: standing context injection skipped')

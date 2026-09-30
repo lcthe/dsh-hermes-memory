@@ -80,7 +80,7 @@ test('exposes consolidation controls in a collapsible settings card', async () =
   assert.match(component, /consolidationThresholdChars/)
   assert.match(component, /consolidationTargetChars/)
   assert.match(entry, /DEFAULT_MEMORY_SETTINGS/)
-  assert.match(entry, /\.\.\.DEFAULT_MEMORY_SETTINGS, \.\.\.scope\.getSnapshot\(\)\.value/)
+  assert.match(entry, /\.\.\.DEFAULT_MEMORY_SETTINGS, \.\.\.form\.getSnapshot\(\)\.value/)
 })
 
 test('uses native DSH input visuals for numeric settings', async () => {

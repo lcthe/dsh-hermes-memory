@@ -1,5 +1,8 @@
 import { createUserMessage, type UserMessage } from '@deepseek-ai/dsh-llm'
 import type { Context } from '@deepseek-ai/cordis'
+// Type-only: pulls the `agent/created` Context merge into this program.
+import type {} from '@deepseek-ai/dsh-agent'
+import type { HermesMemoryMessageSource } from '../core/types.ts'
 import type { MemoryRecord } from '../core/types.ts'
 import { MEMORY_CATEGORIES } from '../core/types.ts'
 import type { MemoryStorage } from './storage.ts'
@@ -106,22 +109,21 @@ export interface MemoryInjectionAgent {
   readonly session: {
     readonly header: { readonly cwd?: string }
     readonly surface?: { readonly nodes: readonly number[] }
-    readonly events?: Record<number, unknown>
+    eventAt?(seq: number): unknown
   }
   inject(message: UserMessage): void
 }
 
 function alreadyInjected(agent: MemoryInjectionAgent): boolean {
   for (const seq of agent.session.surface?.nodes ?? []) {
-    const event = agent.session.events?.[seq]
+    const event = agent.session.eventAt?.(seq)
     if (typeof event !== 'object' || event === null) continue
     const candidate = event as {
       type?: unknown
-      data?: { source?: { kind?: unknown; plugin?: unknown; form?: unknown } }
+      data?: { source?: Partial<HermesMemoryMessageSource> }
     }
     if (candidate.type !== 'user/message') continue
-    if (candidate.data?.source?.kind !== 'plugin') continue
-    if (candidate.data.source.plugin !== '@lcthe/dsh-hermes-memory') continue
+    if (candidate.data?.source?.kind !== 'hermes-memory') continue
     if (candidate.data.source.form === 'recall') return true
   }
   return false
@@ -139,7 +141,7 @@ export function installMemoryInjection(
   repository: MemoryReferenceMaintenance,
 ): () => boolean {
   const injected = new WeakSet<object>()
-  const stop = ctx.on('agent/session-start', ({ agent }) => {
+  const stop = ctx.on('agent/created', ({ agent }) => {
     if (injected.has(agent)) return
     injected.add(agent)
     try {
@@ -155,8 +157,7 @@ export function installMemoryInjection(
       agent.inject(createUserMessage({
         content: [{ type: 'text', text }],
         source: {
-          kind: 'plugin',
-          plugin: '@lcthe/dsh-hermes-memory',
+          kind: 'hermes-memory',
           form: 'recall',
         },
       }))

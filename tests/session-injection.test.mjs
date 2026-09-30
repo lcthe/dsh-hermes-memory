@@ -19,7 +19,7 @@ function setup({ enabled = true, automaticInjection = true, entries = [['one', r
   let listener
   const ctx = {
     on(name, callback) {
-      assert.equal(name, 'agent/session-start')
+      assert.equal(name, 'agent/created')
       listener = callback
       return () => {
         listener = undefined
@@ -27,7 +27,7 @@ function setup({ enabled = true, automaticInjection = true, entries = [['one', r
       }
     },
     emit(name, payload) {
-      assert.equal(name, 'agent/session-start')
+      assert.equal(name, 'agent/created')
       listener?.(payload)
     },
   }
@@ -50,8 +50,9 @@ function setup({ enabled = true, automaticInjection = true, entries = [['one', r
   const logger = { warn: message => warnings.push(message) }
   const markedIds = []
   const repository = { markReferenced: async (ids) => { markedIds.push(...ids) } }
+  const events = {}
   const agent = {
-    session: { header: { cwd: '/repo' }, surface: { nodes: [] }, events: {} },
+    session: { header: { cwd: '/repo' }, surface: { nodes: [] }, events, eventAt: seq => events[seq] },
     messages: [],
     inject(message) { this.messages.push(message) },
   }
@@ -62,22 +63,21 @@ test('injects one bounded message per agent lifecycle', () => {
   const state = setup()
   const dispose = installMemoryInjection(state.ctx, state.storage, state.settings, state.logger, state.repository)
 
-  state.ctx.emit('agent/session-start', { agent: state.agent, source: 'startup' })
-  state.ctx.emit('agent/session-start', { agent: state.agent, source: 'resume' })
+  state.ctx.emit('agent/created', { agent: state.agent, source: 'startup' })
+  state.ctx.emit('agent/created', { agent: state.agent, source: 'resume' })
 
   assert.equal(state.agent.messages.length, 1)
-  assert.equal(state.agent.messages[0].source.kind, 'plugin')
-  assert.equal(state.agent.messages[0].source.plugin, '@lcthe/dsh-hermes-memory')
+  assert.equal(state.agent.messages[0].source.kind, 'hermes-memory')
   assert.equal(state.agent.messages[0].source.form, 'recall')
   assert.match(state.agent.messages[0].content[0].text, /Answer in Chinese/)
 
   dispose()
   const secondAgent = {
-    session: { header: { cwd: '/repo' }, surface: { nodes: [] }, events: {} },
+    session: { header: { cwd: '/repo' }, surface: { nodes: [] }, events: {}, eventAt: () => undefined },
     messages: [],
     inject(message) { this.messages.push(message) },
   }
-  state.ctx.emit('agent/session-start', { agent: secondAgent, source: 'startup' })
+  state.ctx.emit('agent/created', { agent: secondAgent, source: 'startup' })
   assert.equal(secondAgent.messages.length, 0)
 })
 
@@ -88,26 +88,25 @@ test('does not duplicate an existing recall message on resume', () => {
     type: 'user/message',
     data: {
       source: {
-        kind: 'plugin',
-        plugin: '@lcthe/dsh-hermes-memory',
+        kind: 'hermes-memory',
         form: 'recall',
       },
     },
   }
   installMemoryInjection(state.ctx, state.storage, state.settings, state.logger, state.repository)
-  state.ctx.emit('agent/session-start', { agent: state.agent, source: 'resume' })
+  state.ctx.emit('agent/created', { agent: state.agent, source: 'resume' })
   assert.equal(state.agent.messages.length, 0)
 })
 
 test('does not inject when disabled or when no candidates exist', () => {
   const disabled = setup({ automaticInjection: false })
   installMemoryInjection(disabled.ctx, disabled.storage, disabled.settings, disabled.logger, disabled.repository)
-  disabled.ctx.emit('agent/session-start', { agent: disabled.agent, source: 'startup' })
+  disabled.ctx.emit('agent/created', { agent: disabled.agent, source: 'startup' })
   assert.equal(disabled.agent.messages.length, 0)
 
   const empty = setup({ entries: [] })
   installMemoryInjection(empty.ctx, empty.storage, empty.settings, empty.logger, empty.repository)
-  empty.ctx.emit('agent/session-start', { agent: empty.agent, source: 'startup' })
+  empty.ctx.emit('agent/created', { agent: empty.agent, source: 'startup' })
   assert.equal(empty.agent.messages.length, 0)
 })
 
@@ -116,7 +115,7 @@ test('contains injection failures and logs only a stable warning', () => {
   state.agent.inject = () => { throw new Error('secret text should not be logged') }
   installMemoryInjection(state.ctx, state.storage, state.settings, state.logger, state.repository)
 
-  assert.doesNotThrow(() => state.ctx.emit('agent/session-start', { agent: state.agent, source: 'startup' }))
+  assert.doesNotThrow(() => state.ctx.emit('agent/created', { agent: state.agent, source: 'startup' }))
   assert.deepEqual(state.warnings, ['dsh-hermes-memory: startup memory injection skipped'])
   assert.equal(state.warnings.some(message => message.includes('secret')), false)
 })
@@ -124,14 +123,14 @@ test('contains injection failures and logs only a stable warning', () => {
 test('marks referenced memories only after a successful injection', async () => {
   const state = setup()
   installMemoryInjection(state.ctx, state.storage, state.settings, state.logger, state.repository)
-  state.ctx.emit('agent/session-start', { agent: state.agent, source: 'startup' })
+  state.ctx.emit('agent/created', { agent: state.agent, source: 'startup' })
   await new Promise(resolve => setImmediate(resolve))
   assert.deepEqual(state.markedIds, ['one'])
 
   const failing = setup()
   failing.agent.inject = () => { throw new Error('boom') }
   installMemoryInjection(failing.ctx, failing.storage, failing.settings, failing.logger, failing.repository)
-  failing.ctx.emit('agent/session-start', { agent: failing.agent, source: 'startup' })
+  failing.ctx.emit('agent/created', { agent: failing.agent, source: 'startup' })
   await new Promise(resolve => setImmediate(resolve))
   assert.deepEqual(failing.markedIds, [])
 })
@@ -144,7 +143,7 @@ test('skips malformed entries while preserving valid candidates', () => {
     ],
   })
   installMemoryInjection(state.ctx, state.storage, state.settings, state.logger, state.repository)
-  state.ctx.emit('agent/session-start', { agent: state.agent, source: 'startup' })
+  state.ctx.emit('agent/created', { agent: state.agent, source: 'startup' })
 
   assert.equal(state.agent.messages.length, 1)
   assert.match(state.agent.messages[0].content[0].text, /Use pnpm/)

@@ -52,7 +52,7 @@ function setup() {
   let listener
   const ctx = {
     on(name, callback) {
-      assert.equal(name, 'agent/session-start')
+      assert.equal(name, 'agent/created')
       listener = callback
       return () => {
         listener = undefined
@@ -60,7 +60,7 @@ function setup() {
       }
     },
     emit(name, payload) {
-      assert.equal(name, 'agent/session-start')
+      assert.equal(name, 'agent/created')
       listener?.(payload)
     },
   }
@@ -115,7 +115,7 @@ test('removes expired records and keeps fresh ones', async () => {
     ['fresh', record('fresh', 'global', new Date(NOW - 1 * DAY).toISOString())],
   )
   installRetention(state.ctx, state.storage, state.settings, state.logger)
-  state.ctx.emit('agent/session-start', { agent: {}, source: 'startup' })
+  state.ctx.emit('agent/created', { agent: {}, source: 'startup' })
   await tick()
 
   assert.deepEqual(state.deleted, ['expired'])
@@ -136,15 +136,15 @@ test('throttles sweeps and tolerates per-record delete failures', async () => {
     ['b', record('b', 'failure', new Date(NOW - 100 * DAY).toISOString())],
   )
   const dispose = installRetention(state.ctx, state.storage, state.settings, state.logger)
-  state.ctx.emit('agent/session-start', { agent: {}, source: 'startup' })
-  state.ctx.emit('agent/session-start', { agent: {}, source: 'startup' })
-  state.ctx.emit('agent/session-start', { agent: {}, source: 'startup' })
+  state.ctx.emit('agent/created', { agent: {}, source: 'startup' })
+  state.ctx.emit('agent/created', { agent: {}, source: 'startup' })
+  state.ctx.emit('agent/created', { agent: {}, source: 'startup' })
   await tick()
 
   assert.equal(deleteCount, 2)
   assert.ok(state.warnings.some(message => /retention removed 1/.test(message)))
   dispose()
-  state.ctx.emit('agent/session-start', { agent: {}, source: 'startup' })
+  state.ctx.emit('agent/created', { agent: {}, source: 'startup' })
   await tick()
   assert.equal(deleteCount, 2)
 })

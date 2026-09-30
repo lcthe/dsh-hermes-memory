@@ -1,5 +1,6 @@
 import { defineTool } from '@deepseek-ai/dsh-tools'
-import type { JsonValue, ToolRunContext } from '@deepseek-ai/dsh-tools'
+import type { ToolRunContext } from '@deepseek-ai/dsh-tools'
+import type { JsonValue } from '@deepseek-ai/dsh-util-values'
 import { MEMORY_CATEGORIES, MEMORY_SCOPES } from '../core/types.ts'
 import { searchSessionMemory } from './session-search.ts'
 import {

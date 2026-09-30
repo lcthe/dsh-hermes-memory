@@ -1,4 +1,5 @@
 import type { Context } from '@deepseek-ai/cordis'
+import type { Agent } from '@deepseek-ai/dsh-agent'
 import type { Session, SessionEvent, SessionId } from '@deepseek-ai/dsh-session'
 import type { ReviewBudget, ReviewProjection } from './review-types.ts'
 import { REVIEW_OUTPUT_SCHEMA, validateReviewOutput } from './review-schema.ts'
@@ -21,7 +22,7 @@ interface JobHooks {
   done: Promise<{ status: 'completed' | 'killed' | 'failed'; detail?: string }>
 }
 
-type AgentLike = NonNullable<Context['agent']>
+type AgentLike = Agent
 
 interface JobRegistryLike {
   start(spec: {
@@ -102,7 +103,7 @@ function sessionProjection(session: Session, budget: ReviewBudget): ReviewProjec
   const users: string[] = []
   const assistants: string[] = []
   const failures: string[] = []
-  for (const event of session.events) {
+  for (const event of session.snapshotEvents()) {
     if (event.type === 'user/message') users.push(textFromEvent(event))
     if (event.type === 'assistant/message') assistants.push(textFromEvent(event))
     if (event.type === 'tool/result') {
@@ -160,7 +161,7 @@ export function installAutoReview(
       if (subagents === undefined || jobs === undefined || owner === undefined) return
       const provider = pickProvider(subagents)
       const budget = toBudget(currentSettings)
-      const flushedSeq = session.events.at(-1)?.seq ?? -1
+      const flushedSeq = session.seq - 1
       const currentPromise = storage.reviews.get(String(session.id))
       void currentPromise.then(current => {
         if (!shouldScheduleReview({

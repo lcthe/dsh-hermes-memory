@@ -11,20 +11,22 @@ function setup({ enabled = true, standingContextEnabled = true, recorded = false
   let listener
   const ctx = {
     on(name, callback) {
-      assert.equal(name, 'agent/session-start')
+      assert.equal(name, 'agent/created')
       listener = callback
       return () => { listener = undefined }
     },
     emit(name, payload) {
-      assert.equal(name, 'agent/session-start')
+      assert.equal(name, 'agent/created')
       listener?.(payload)
     },
   }
+  const events = recorded ? { 1: { type: 'user/message', data: { content: [{ type: 'text', text: '[DSH standing context]' }], source: { kind: 'hermes-memory', form: 'instructions' } } } } : {}
   const agent = {
     session: {
       header: { cwd: '/repo' },
       surface: { nodes: recorded ? [1] : [] },
-      events: recorded ? { 1: { type: 'user/message', data: { content: [{ type: 'text', text: '[DSH standing context]' }], source: { kind: 'plugin', plugin: '@lcthe/dsh-hermes-memory', form: 'instructions' } } } } : {},
+      events,
+      eventAt: seq => events[seq],
     },
     messages: [],
     inject(message) { this.messages.push(message) },
@@ -45,7 +47,7 @@ test('renders bounded profile and instruction context', () => {
 test('injects standing context even when ordinary injection is disabled', async () => {
   const state = setup()
   installStandingInjection(state.ctx, state.store, state.settings, state.logger)
-  state.ctx.emit('agent/session-start', { agent: state.agent, source: 'startup' })
+  state.ctx.emit('agent/created', { agent: state.agent, source: 'startup' })
   await new Promise(resolve => setImmediate(resolve))
   assert.equal(state.agent.messages.length, 1)
   assert.equal(state.agent.messages[0].source.form, 'instructions')
@@ -55,7 +57,7 @@ test('injects standing context even when ordinary injection is disabled', async 
 test('does not duplicate standing context on resume', async () => {
   const state = setup({ recorded: true })
   installStandingInjection(state.ctx, state.store, state.settings, state.logger)
-  state.ctx.emit('agent/session-start', { agent: state.agent, source: 'resume' })
+  state.ctx.emit('agent/created', { agent: state.agent, source: 'resume' })
   await new Promise(resolve => setImmediate(resolve))
   assert.equal(state.agent.messages.length, 0)
 })
@@ -63,13 +65,13 @@ test('does not duplicate standing context on resume', async () => {
 test('skips injection when disabled or empty', async () => {
   const disabled = setup({ enabled: false })
   installStandingInjection(disabled.ctx, disabled.store, disabled.settings, disabled.logger)
-  disabled.ctx.emit('agent/session-start', { agent: disabled.agent, source: 'startup' })
+  disabled.ctx.emit('agent/created', { agent: disabled.agent, source: 'startup' })
   await new Promise(resolve => setImmediate(resolve))
   assert.equal(disabled.agent.messages.length, 0)
   const empty = setup()
   empty.store.list = async () => []
   installStandingInjection(empty.ctx, empty.store, empty.settings, empty.logger)
-  empty.ctx.emit('agent/session-start', { agent: empty.agent, source: 'startup' })
+  empty.ctx.emit('agent/created', { agent: empty.agent, source: 'startup' })
   await new Promise(resolve => setImmediate(resolve))
   assert.equal(empty.agent.messages.length, 0)
 })

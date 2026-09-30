@@ -1,10 +1,11 @@
+import type { Context } from '@deepseek-ai/cordis'
+// Type-only: pulls the `loader/volatile-update` Context merge into this program.
+import type {} from '@deepseek-ai/cordis-plugin-loader'
 import z from '@deepseek-ai/schemastery'
-import { settingsNamespace } from '@deepseek-ai/dsh-settings'
 
 import { MEMORY_SETTINGS_NAME } from '../settings-contract.ts'
 
 export { MEMORY_SETTINGS_NAME }
-export const MEMORY_SETTINGS_NS = settingsNamespace(MEMORY_SETTINGS_NAME)
 
 export interface MemorySettings {
   enabled: boolean
@@ -37,36 +38,96 @@ export interface MemorySettings {
   reviewMaxInputChars: number
 }
 
-export const MemorySettingsSchema: z<MemorySettings> = z.object({
-  enabled: z.boolean().default(true),
-  defaultLimit: z.number().default(8),
-  projectMemoryEnabled: z.boolean().default(true),
-  automaticCapture: z.boolean().default(false),
-  capturePreferences: z.boolean().default(true),
-  captureConventions: z.boolean().default(true),
-  captureCorrections: z.boolean().default(true),
-  captureToolContext: z.boolean().default(true),
-  captureMaxPerSession: z.number().default(5),
-  retentionEnabled: z.boolean().default(true),
-  retentionDays: z.number().default(90),
-  failureRetentionDays: z.number().default(30),
-  automaticInjection: z.boolean().default(false),
-  injectionLimit: z.number().default(5),
-  injectionMaxChars: z.number().default(3_000),
-  includeUserMemory: z.boolean().default(true),
-  includeProjectMemory: z.boolean().default(true),
-  standingContextEnabled: z.boolean().default(true),
-  standingMaxEntries: z.number().default(20),
-  standingMaxChars: z.number().default(2_000),
-  automaticConsolidation: z.boolean().default(false),
-  consolidationThresholdChars: z.number().default(40_000),
-  consolidationTargetChars: z.number().default(28_000),
-  consolidationMaxRecords: z.number().default(100),
-  consolidationMaxReplacements: z.number().default(20),
-  automaticReview: z.boolean().default(false),
-  reviewMaxPerSession: z.number().default(5),
-  reviewMaxInputChars: z.number().default(12_000),
+export const Config = z.object({
+  enabled: z.boolean().default(true).volatile(),
+  defaultLimit: z.number().step(1).min(1).max(20).default(8).volatile(),
+  projectMemoryEnabled: z.boolean().default(true).volatile(),
+  automaticCapture: z.boolean().default(false).volatile(),
+  capturePreferences: z.boolean().default(true).volatile(),
+  captureConventions: z.boolean().default(true).volatile(),
+  captureCorrections: z.boolean().default(true).volatile(),
+  captureToolContext: z.boolean().default(true).volatile(),
+  captureMaxPerSession: z.number().step(1).min(1).max(20).default(5).volatile(),
+  retentionEnabled: z.boolean().default(true).volatile(),
+  retentionDays: z.number().step(1).min(0).max(3650).default(90).volatile(),
+  failureRetentionDays: z.number().step(1).min(1).max(3650).default(30).volatile(),
+  automaticInjection: z.boolean().default(false).volatile(),
+  injectionLimit: z.number().step(1).min(1).max(10).default(5).volatile(),
+  injectionMaxChars: z.number().step(1).min(500).max(8_000).default(3_000).volatile(),
+  includeUserMemory: z.boolean().default(true).volatile(),
+  includeProjectMemory: z.boolean().default(true).volatile(),
+  standingContextEnabled: z.boolean().default(true).volatile(),
+  standingMaxEntries: z.number().step(1).min(1).max(20).default(20).volatile(),
+  standingMaxChars: z.number().step(1).min(100).max(2_000).default(2_000).volatile(),
+  automaticConsolidation: z.boolean().default(false).volatile(),
+  consolidationThresholdChars: z.number().step(1).min(1_000).max(1_000_000).default(40_000).volatile(),
+  consolidationTargetChars: z.number().step(1).min(1_000).max(1_000_000).default(28_000).volatile(),
+  consolidationMaxRecords: z.number().step(1).min(2).max(100).default(100).volatile(),
+  consolidationMaxReplacements: z.number().step(1).min(1).max(20).default(20).volatile(),
+  automaticReview: z.boolean().default(false).volatile(),
+  reviewMaxPerSession: z.number().step(1).min(1).max(20).default(5).volatile(),
+  reviewMaxInputChars: z.number().step(1).min(2_000).max(30_000).default(12_000).volatile(),
 })
+
+/**
+ * Resolved plugin Config: every field is a live reference, so consumers read
+ * `.get()` when starting an operation instead of caching a snapshot.
+ */
+export type MemoryConfig = Schemastery.TypeT<typeof Config>
+
+/** One resolved settings snapshot, detached from the live references. */
+export function readMemorySettings(config: MemoryConfig): MemorySettings {
+  return {
+    enabled: config.enabled.get(),
+    defaultLimit: config.defaultLimit.get(),
+    projectMemoryEnabled: config.projectMemoryEnabled.get(),
+    automaticCapture: config.automaticCapture.get(),
+    capturePreferences: config.capturePreferences.get(),
+    captureConventions: config.captureConventions.get(),
+    captureCorrections: config.captureCorrections.get(),
+    captureToolContext: config.captureToolContext.get(),
+    captureMaxPerSession: config.captureMaxPerSession.get(),
+    retentionEnabled: config.retentionEnabled.get(),
+    retentionDays: config.retentionDays.get(),
+    failureRetentionDays: config.failureRetentionDays.get(),
+    automaticInjection: config.automaticInjection.get(),
+    injectionLimit: config.injectionLimit.get(),
+    injectionMaxChars: config.injectionMaxChars.get(),
+    includeUserMemory: config.includeUserMemory.get(),
+    includeProjectMemory: config.includeProjectMemory.get(),
+    standingContextEnabled: config.standingContextEnabled.get(),
+    standingMaxEntries: config.standingMaxEntries.get(),
+    standingMaxChars: config.standingMaxChars.get(),
+    automaticConsolidation: config.automaticConsolidation.get(),
+    consolidationThresholdChars: config.consolidationThresholdChars.get(),
+    consolidationTargetChars: config.consolidationTargetChars.get(),
+    consolidationMaxRecords: config.consolidationMaxRecords.get(),
+    consolidationMaxReplacements: config.consolidationMaxReplacements.get(),
+    automaticReview: config.automaticReview.get(),
+    reviewMaxPerSession: config.reviewMaxPerSession.get(),
+    reviewMaxInputChars: config.reviewMaxInputChars.get(),
+  }
+}
+
+/** Live settings face the runtime installers consume. */
+export interface MemorySettingsSource {
+  get(): MemorySettings
+  watch(listener: () => void): () => void
+}
+
+/**
+ * Bind the plugin's own Config section: reads resolve the current volatile
+ * references, and `watch` follows the Loader's live configuration updates.
+ * @param ctx - plugin context carrying the Loader's update event.
+ * @param config - resolved plugin Config.
+ * @returns the settings face shared by every installer.
+ */
+export function createMemorySettingsSource(ctx: Context, config: MemoryConfig): MemorySettingsSource {
+  return {
+    get: () => readMemorySettings(config),
+    watch: listener => ctx.on('loader/volatile-update', () => { listener() }),
+  }
+}
 
 export function validateMemorySettings(value: MemorySettings): void {
   const reviewMaxPerSession = value.reviewMaxPerSession ?? 5

@@ -1,4 +1,5 @@
 import type { Context } from '@deepseek-ai/cordis'
+import type { Agent } from '@deepseek-ai/dsh-agent'
 import type { Session } from '@deepseek-ai/dsh-session'
 import type { MemoryRepository } from '../core/memory-repository.ts'
 import type { MemoryStorage } from './storage.ts'
@@ -43,7 +44,7 @@ export function installAutoConsolidation(
   const schedule = (session: Session): void => {
     const value = settings.get()
     const subagents = ctx.get('subagents') as Subagents | undefined
-    const agents = ctx.get('agents') as { get(id: string): NonNullable<Context['agent']> | undefined } | undefined
+    const agents = ctx.get('agents') as { get(id: string): Agent | undefined } | undefined
     const provider = subagents && providerOf(subagents)
     const owner = agents?.get(String(session.id))
     if (!provider || !owner || !value.enabled || !value.automaticConsolidation) return
@@ -60,7 +61,7 @@ export function installAutoConsolidation(
         if (records.length < 2) return
         active.add(key)
         return runConsolidation({
-          id: `auto-${key}-${session.events.at(-1)?.seq ?? 0}`, scope: 'user', records,
+          id: `auto-${key}-${session.seq - 1}`, scope: 'user', records,
           targetChars: value.consolidationTargetChars ?? 28_000, provider, parent: owner, subagents,
           storage: { table: storage.table, states: storage.consolidations },
         }).finally(() => { active.delete(key) })

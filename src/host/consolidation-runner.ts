@@ -1,11 +1,10 @@
-import type { Context } from '@deepseek-ai/cordis'
+import type { Agent } from '@deepseek-ai/dsh-agent'
 import type { MemoryRecord } from '../core/types.ts'
 import { parseConsolidationOutput } from './consolidation-schema.ts'
 import { buildConsolidationPrompt, CONSOLIDATION_OUTPUT_SCHEMA } from './consolidation-prompt.ts'
 import { executeConsolidation, prepareConsolidation, type ConsolidationStorage } from './consolidation-executor.ts'
 
 interface SubagentRun { result: Promise<{ stopReason: string; structured?: unknown }>; dispose(): Promise<void> }
-type Agent = NonNullable<Context['agent']>
 interface Subagents {
   start(name: string, request: { label: string; prompt: Array<{ type: 'text'; text: string }>; parent: Agent; signal: AbortSignal; outputSchema: object }): Promise<SubagentRun>
 }

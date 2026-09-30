@@ -1,4 +1,6 @@
 import type { Context } from '@deepseek-ai/cordis'
+// Type-only: pulls the `ctx.settings` Context merge into this program.
+import type {} from '@deepseek-ai/dsh-settings'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import type { ToolDefinition } from '@deepseek-ai/dsh-tools'
 import { openMemoryStorage, StorageMemoryRepository } from './host/storage.ts'
@@ -11,16 +13,17 @@ import { installRetention } from './host/retention.ts'
 import { installAutoReview } from './host/auto-review.ts'
 import { installAutoConsolidation } from './host/auto-consolidation.ts'
 import { installMemorySkillProvider } from './host/memory-skill-provider.ts'
-import { validateMemorySettings, MemorySettingsSchema, MEMORY_SETTINGS_NS } from './host/settings.ts'
+import { createMemorySettingsSource, Config, type MemoryConfig } from './host/settings.ts'
+
+export { Config } from './host/settings.ts'
 
 export const name = '@lcthe/dsh-hermes-memory'
 export const inject = ['storageDomain', 'tools', 'settings', 'sessionQuery', 'skills']
 
-export async function apply(ctx: Context): Promise<void> {
-  const settings = ctx.settings.register(MEMORY_SETTINGS_NS, MemorySettingsSchema, {
-    applies: 'live',
-    validate: validateMemorySettings,
-  })
+export async function apply(ctx: Context, config: MemoryConfig): Promise<void> {
+  // This plugin ships its own settings page, so the schema-derived page stays off.
+  ctx.effect(() => ctx.settings.configure({ auto: false }, ctx.fiber), 'dshHermesMemory.settingsPage')
+  const settings = createMemorySettingsSource(ctx, config)
   const storage = await openMemoryStorage(ctx)
   const repository = new StorageMemoryRepository(storage)
   const tools = createMemoryTools({ repository, sessionQuery: ctx.sessionQuery, standing: storage.standing, settings, logger: ctx.logger })

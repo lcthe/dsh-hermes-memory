@@ -1,6 +1,6 @@
-import type { Context } from '@deepseek-ai/cordis'
-import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
+import type { Context as ClientContext } from '@deepseek-ai/cordis'
 import type {} from '@deepseek-ai/dsh-client-locale/client'
+import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import type {} from '@deepseek-ai/dsh-client-ui-settings/client'
 import type {} from '@deepseek-ai/dsh-client-ui-slots'
 import { MemorySettingsSection } from './MemorySettings.tsx'
@@ -15,7 +15,7 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
   }
 }
 
-export const inject = ['slots', 'locale', 'settingsScope']
+export const inject = ['slots', 'locale', 'configForms']
 
 const DEFAULT_MEMORY_SETTINGS: MemorySettings = {
   enabled: true,
@@ -52,7 +52,7 @@ export function apply(ctx: ClientContext): void {
   ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'dsh-hermes-memory: dictionaries')
   const t = ctx.locale.bind(NS)
 
-  const scope = ctx.settingsScope.bind<MemorySettings>({ namespace: MEMORY_SETTINGS_NAME })
+  const form = ctx.configForms.get<MemorySettings>(MEMORY_SETTINGS_NAME)
 
   ctx.slots.inject('settings.section', () => ctx.slots.register({
     name: 'settings.section',
@@ -62,9 +62,9 @@ export function apply(ctx: ClientContext): void {
     locale: NS,
     inject: () => ({
       t,
-      read: () => ({ ...DEFAULT_MEMORY_SETTINGS, ...scope.getSnapshot().value }),
+      read: () => ({ ...DEFAULT_MEMORY_SETTINGS, ...form.getSnapshot().value }),
       update: async (patch: Partial<MemorySettings>) => {
-        for (const [field, value] of Object.entries(patch)) await scope.set(field, value)
+        for (const [field, value] of Object.entries(patch)) await form.set(field, value)
       },
     }),
   }, MemorySettingsSection))

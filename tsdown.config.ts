@@ -6,16 +6,19 @@ import { transform } from 'lightningcss'
 const ID = '@lcthe/dsh-hermes-memory'
 const CSS_VIRTUAL_PREFIX = '\\0dsh-hermes-memory-css:'
 const CSS_VIRTUAL_SUFFIX = '.mjs'
+// The 0.2.0-rc.2 shell's frozen module table
+// (`@deepseek-ai/dsh-client-web/src/platform`): every other specifier this
+// bundle touches is inlined.
 const PLATFORM_MODULES = [
   'react',
   'react/jsx-runtime',
   'react-dom',
   'react-dom/client',
   '@deepseek-ai/cordis',
+  '@deepseek-ai/dsh-client-store',
   '@deepseek-ai/dsh-client-ui-slots',
-  '@deepseek-ai/dsh-client-ui-settings',
   '@deepseek-ai/dsh-client-ui-primitives',
-  '@deepseek-ai/dsh-client-runtime/client',
+  '@deepseek-ai/dsh-client-ui-dockkit',
 ]
 
 function libraryConfig(): UserConfig {

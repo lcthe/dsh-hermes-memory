@@ -1,6 +1,23 @@
 export const MEMORY_SCOPES = ['global', 'user', 'project', 'failure'] as const
 export type MemoryScope = (typeof MEMORY_SCOPES)[number]
 
+/**
+ * Producer identity DSH records on the user messages this plugin injects:
+ * `recall` is the session-start memory excerpt, `instructions` the standing
+ * profile/instruction block. Consumers that do not know the kind present the
+ * content as opaque context.
+ */
+export interface HermesMemoryMessageSource {
+  kind: 'hermes-memory'
+  form: 'recall' | 'instructions'
+}
+
+declare module '@deepseek-ai/dsh-llm' {
+  interface MessageSourceMap {
+    'hermes-memory': HermesMemoryMessageSource
+  }
+}
+
 export const MEMORY_CATEGORIES = [
   'preference',
   'convention',

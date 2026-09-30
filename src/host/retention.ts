@@ -1,4 +1,6 @@
 import type { Context } from '@deepseek-ai/cordis'
+// Type-only: pulls the `agent/created` Context merge into this program.
+import type {} from '@deepseek-ai/dsh-agent'
 import type { MemoryRecord } from '../core/types.ts'
 import type { MemoryStorage } from './storage.ts'
 import type { MemorySettings } from './settings.ts'
@@ -73,7 +75,7 @@ export function installRetention(
   let lastSweepAt = 0
   let inFlight = false
 
-  const sweep = (): void => {
+  const sweep = (): undefined => {
     if (inFlight) return
     const now = Date.now()
     if (now - lastSweepAt < RETENTION_THROTTLE_MS) return
@@ -85,5 +87,5 @@ export function installRetention(
   }
 
   sweep()
-  return ctx.on('agent/session-start', sweep)
+  return ctx.on('agent/created', sweep)
 }
