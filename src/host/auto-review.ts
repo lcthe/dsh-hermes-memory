@@ -14,6 +14,7 @@ import type { MemorySettings } from './settings.ts'
 import type { MemoryStorage } from './storage.ts'
 import { applyReviewOperations } from './review-runner.ts'
 import { scanContent } from '../core/content-scanner.ts'
+import { pickOutputSchemaProvider, type SubagentRuntimeLike as SubagentProviderRuntime } from './subagent-providers.ts'
 
 const MIN_REVIEW_INPUT_CHARS = 6
 
@@ -43,8 +44,7 @@ interface SubagentRunLike {
   dispose(): Promise<void>
 }
 
-interface SubagentRuntimeLike {
-  list(): string[]
+interface SubagentRuntimeLike extends SubagentProviderRuntime {
   getProvider(name: string): { capabilities: { outputSchema: boolean } } | undefined
   start(name: string, request: {
     label: string
@@ -126,13 +126,6 @@ function sessionProjection(session: Session, budget: ReviewBudget): ReviewProjec
   }
 }
 
-function pickProvider(subagents: SubagentRuntimeLike): string | undefined {
-  for (const name of subagents.list()) {
-    if (subagents.getProvider(name)?.capabilities.outputSchema) return name
-  }
-  return undefined
-}
-
 function toBudget(settings: MemorySettings): ReviewBudget {
   return {
     maxOperations: settings.reviewMaxPerSession ?? 5,
@@ -159,7 +152,7 @@ export function installAutoReview(
       const agents = ctx.get('agents') as { get(id: string): AgentLike | undefined } | undefined
       const owner = agents?.get(String(session.id) as SessionId)
       if (subagents === undefined || jobs === undefined || owner === undefined) return
-      const provider = pickProvider(subagents)
+      const provider = pickOutputSchemaProvider(subagents)
       const budget = toBudget(currentSettings)
       const flushedSeq = session.seq - 1
       const currentPromise = storage.reviews.get(String(session.id))

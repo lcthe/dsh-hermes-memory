@@ -7,6 +7,7 @@ import type { MemorySettings } from './settings.ts'
 import type { ConsolidationState } from './consolidation-types.ts'
 import { executeConsolidation } from './consolidation-executor.ts'
 import { runConsolidation } from './consolidation-runner.ts'
+import { pickOutputSchemaProvider, type SubagentRuntimeLike } from './subagent-providers.ts'
 
 export interface AutoConsolidationScheduleInput {
   enabled: boolean
@@ -22,14 +23,9 @@ export function shouldScheduleConsolidation(input: AutoConsolidationScheduleInpu
     && input.totalChars >= input.thresholdChars
 }
 
-interface Subagents {
-  list(): string[]
+interface Subagents extends SubagentRuntimeLike {
   getProvider(name: string): { capabilities: { outputSchema: boolean } } | undefined
   start: Parameters<typeof runConsolidation>[0]['subagents']['start']
-}
-
-function providerOf(subagents: Subagents): string | undefined {
-  return subagents.list().find(name => subagents.getProvider(name)?.capabilities.outputSchema)
 }
 
 export function installAutoConsolidation(
@@ -45,7 +41,7 @@ export function installAutoConsolidation(
     const value = settings.get()
     const subagents = ctx.get('subagents') as Subagents | undefined
     const agents = ctx.get('agents') as { get(id: string): Agent | undefined } | undefined
-    const provider = subagents && providerOf(subagents)
+    const provider = subagents && pickOutputSchemaProvider(subagents)
     const owner = agents?.get(String(session.id))
     if (!provider || !owner || !value.enabled || !value.automaticConsolidation) return
     const key = String(session.id)
